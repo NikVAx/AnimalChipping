@@ -1,10 +1,5 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data
 {
@@ -41,14 +36,3 @@ namespace Data
         }
     }
 }
-
-/*
- System.InvalidOperationException:
-  "Both relationships between 'AnimalVisitedLocation.LocationPoint' and
-  'LocationPoint' and between 'AnimalVisitedLocation' and 'LocationPoint'
-could use {'LocationPointId'} as the foreign key.
-
-To resolve this, configure the foreign key properties explicitly in 'OnModelCreating' on at least one of the relationships."
-
- 
- */
