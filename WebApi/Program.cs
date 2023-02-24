@@ -1,3 +1,5 @@
+using Data;
+
 namespace WebApi
 {
     public class Program
@@ -5,9 +7,11 @@ namespace WebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            
+            var configuration = builder.Configuration;
 
             // Add services to the container.
-
+            builder.Services.AddDataLayer(configuration);
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
