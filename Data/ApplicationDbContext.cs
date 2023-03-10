@@ -1,10 +1,11 @@
-﻿using Domain.Entities;
+﻿using Application.Abstractions.Interfaces;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data
 {
     public class ApplicationDbContext
-        : DbContext
+        : DbContext, IApplicationDbContext
     {
         public DbSet<AnimalType> AnimalTypes { get; set; }
         public DbSet<Animal> Animals { get; set; }
@@ -15,6 +16,7 @@ namespace Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+            Database.EnsureCreated();
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -23,7 +25,7 @@ namespace Data
                    .HasOne<Account>()
                    .WithMany()
                    .HasForeignKey(x => x.ChipperId);
- 
+            
             builder.Entity<Animal>()
                    .HasMany(x => x.AnimalTypes)
                    .WithMany();
@@ -31,6 +33,17 @@ namespace Data
             builder.Entity<Animal>()
                    .HasMany(x => x.VisitedLocations)
                    .WithMany();
+
+            builder.Entity<Account>()
+                   .HasAlternateKey(x => x.Email);
+            
+            builder.Entity<AnimalType>()
+                   .HasIndex(x => x.Type)
+                   .IsUnique();
+            
+            builder.Entity<LocationPoint>()
+                   .HasIndex(x => new { x.Latitude, x.Longitude })
+                   .IsUnique();
 
             base.OnModelCreating(builder);
         }

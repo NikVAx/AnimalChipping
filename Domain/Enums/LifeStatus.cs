@@ -1,8 +1,11 @@
-﻿namespace Domain.Enums
+﻿using System.Text.Json.Serialization;
+
+namespace Domain.Enums
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum LifeStatus
     {
-        Alive,
-        Dead
+        ALIVE,
+        DEAD
     }
 }

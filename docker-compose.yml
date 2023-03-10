@@ -1,11 +1,22 @@
 version: '3.4'
 
 services:
+  postgres:
+    image: postgres:15.1
+    environment:
+      POSTGRES_DB: "chippingapplicationdb"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
+    ports:
+      - "5432:5432"
+
   webapi:
     image: ${DOCKER_REGISTRY-}webapi
     build:
       context: .
       dockerfile: WebApi/Dockerfile
+    depends_on:
+      - postgres
 
   tests: 
     image: mrexpen/planet_olymp_phase1
@@ -18,15 +29,6 @@ services:
       SERVER_URL: http://webapi:80
       STAGE: 0
 
-  postgres:
-    image: postgres:15.1
-    environment:
-      POSTGRES_DB: "chippingapplicationdb"
-      POSTGRES_USER: "admin"
-      POSTGRES_PASSWORD: "admin"
-    ports:
-      - "5432:5432"
-  
   pgadmin:
     image: dpage/pgadmin4:6.20
     environment:

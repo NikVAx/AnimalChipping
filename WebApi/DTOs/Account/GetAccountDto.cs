@@ -1,4 +1,4 @@
-﻿namespace WebApi.DTOs
+﻿namespace WebApi.DTOs.Account
 {
     public class GetAccountDto
     {

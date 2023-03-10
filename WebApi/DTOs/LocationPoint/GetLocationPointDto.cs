@@ -1,4 +1,4 @@
-﻿namespace WebApi.DTOs
+﻿namespace WebApi.DTOs.LocationPoint
 {
     public class GetLocationPointDto
     {
