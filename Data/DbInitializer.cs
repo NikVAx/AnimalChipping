@@ -5,11 +5,12 @@ namespace Data
 {
     public class DbInitializer
     {
-        public static void Initialize(IServiceProvider serviceProvider)
+        public static void RecreateDatabase(IServiceProvider serviceProvider)
         {
             using(var context = new ApplicationDbContext(serviceProvider
                 .GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
             {
+                context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
             }
         }

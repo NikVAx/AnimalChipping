@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.DTOs.Animal;
@@ -9,8 +10,10 @@ namespace WebApi.Controllers
 {
     [Route("animals/types")]
     [ApiController]
-    public class AnimalTypesController
-        : ControllerBase
+    [Produces("application/json")]
+    [Authorize]
+    public class AnimalTypesController :
+        ControllerBase
     {
         private readonly ILogger<AnimalTypesController> _logger;
         private readonly IAnimalTypeService _animalTypeService;

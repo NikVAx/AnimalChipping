@@ -1,4 +1,5 @@
 ﻿using Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,6 +27,14 @@ namespace WebApi.Controllers
         public void DeleteDb()
         {
             _applicationDbContext.Database.EnsureDeleted();
+        }
+
+        [HttpGet("auth")]
+        [Authorize]
+        public async Task<ActionResult> Auth()
+        {
+
+            return Ok();
         }
 
 

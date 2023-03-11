@@ -25,10 +25,15 @@ namespace Application.Services
             return await _applicationDbContext.SaveChangesAsync();
         }
 
-        public async Task<int> RemoveAsync(AnimalType entity)
+        public async Task<int> RemoveAsync(long id)
         {
-            _applicationDbContext.AnimalTypes.Remove(entity);
-            return await _applicationDbContext.SaveChangesAsync();
+            AnimalType entity = new() { Id = id };
+
+            _applicationDbContext.AnimalTypes
+                .Remove(entity);
+
+            return await _applicationDbContext
+                .SaveChangesAsync();
         }
 
         public async Task<AnimalType?> GetByIdAsync(long id)

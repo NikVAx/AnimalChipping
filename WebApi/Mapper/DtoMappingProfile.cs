@@ -30,6 +30,8 @@ namespace WebApi.AutoMapper
             CreateMap<CreateAnimalTypeDto, AnimalType>();
 
             CreateMap<AccountFilterDto, AccountFilter>();
+            CreateMap<Account, GetAccountDto>();
+            CreateMap<RegisterAccountDto, Account>();
         }
         
     }

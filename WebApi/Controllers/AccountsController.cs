@@ -1,17 +1,19 @@
 ﻿using Application.Abstractions.Interfaces;
 using Application.DTOs;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Drawing;
 using WebApi.DTOs.Account;
 
 namespace WebApi.Controllers
 {
     [Route("accounts")]
     [ApiController]
-    public class AccountsController
-        : ControllerBase
+    [Produces("application/json")]
+    [Authorize]
+    public class AccountsController :
+        ControllerBase
     {
         private readonly ILogger<AccountsController> _logger;
         private readonly IAccountService _accountService;
@@ -39,13 +41,8 @@ namespace WebApi.Controllers
             if(account == null)
                 return NotFound();
 
-            var result = new GetAccountDto()
-            {
-                Id = account.Id,
-                Email = account.Email,
-                FirstName = account.FirstName,
-                LastName = account.LastName
-            };
+            var result = _mapper
+                .Map<GetAccountDto>(account);
 
             return Ok(result);
         }
@@ -56,16 +53,38 @@ namespace WebApi.Controllers
             int from = 0,
             int size = 10)
         {
-            if(!ModelState.IsValid || from < 0 || size <= 0)
+            if(ModelState.IsValid == false || from < 0 || size <= 0)
                 return BadRequest();
 
             var filter = _mapper
                 .Map<AccountFilter>(filterDto);
 
-            var result = await _accountService
+            var accounts = await _accountService
                 .SearchAsync(filter, from, size);
 
+            var result = accounts
+                .Select(account => _mapper
+                    .Map<GetAccountDto>(account));
+
             return Ok(result);
+        }
+
+        [HttpPost("/registration")]
+        public async Task<ActionResult<GetAccountDto>> Register(RegisterAccountDto registerDto)
+        {
+            if(ModelState.IsValid == false)
+                return BadRequest();
+
+            var account = _mapper
+                .Map<Account>(registerDto);
+
+            await _accountService
+                .RegisterAsync(account);
+
+            var result = _mapper
+                .Map<GetAccountDto>(account);
+
+            return Created(@$"accounts/{result.Id}", result);
         }
     }
 }

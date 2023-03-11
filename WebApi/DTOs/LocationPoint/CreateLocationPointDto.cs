@@ -4,10 +4,11 @@ namespace WebApi.DTOs.LocationPoint
 {
     public class CreateLocationPointDto
     {
-        [Range(-90, 90)]
+        [Range(-90.00, 90.00)]
         [Required]
         public double Latitude { get; set; }
-        [Range(-180, 180)]
+
+        [Range(-180.00, 180.00)]
         [Required]
         public double Longitude { get; set; }
     }

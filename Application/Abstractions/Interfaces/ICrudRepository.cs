@@ -5,6 +5,6 @@
         public Task<TEntity?> GetByIdAsync(TID id);
         public Task<int> AddAsync(TEntity entity);
         public Task<int> UpdateAsync(TEntity entity);
-        public Task<int> RemoveAsync(TEntity entity);
+        public Task<int> RemoveAsync(TID id);
     }
 }

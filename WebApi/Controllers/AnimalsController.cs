@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Interfaces;
 using Application.DTOs;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.DTOs.Animal;
 using WebApi.DTOs.VisitedLocationPoint;
@@ -9,8 +10,10 @@ namespace WebApi.Controllers
 {
     [Route("animals")]
     [ApiController]
-    public class AnimalsController
-        : ControllerBase
+    [Produces("application/json")]
+    [Authorize]
+    public class AnimalsController :
+        ControllerBase
     {
         private readonly ILogger<AnimalsController> _logger;
         private readonly IAnimalService _animalService;
@@ -53,7 +56,7 @@ namespace WebApi.Controllers
             int from = 0,
             int size = 10)
         {
-            if(!ModelState.IsValid || from < 0 || size <= 0)
+            if(ModelState.IsValid == false || from < 0 || size <= 0)
                 return BadRequest();
 
             var filter = _mapper
@@ -72,7 +75,7 @@ namespace WebApi.Controllers
             int size = 10)
         {
 
-           if(!ModelState.IsValid || from < 0 || size <= 0)
+           if(ModelState.IsValid == false || from < 0 || size <= 0)
                return BadRequest();
 
             var filter = _mapper

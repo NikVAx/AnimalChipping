@@ -26,10 +26,15 @@ namespace Application.Services
         public async Task<Animal?> GetByIdAsync(long id)
             => await _applicationDbContext.Animals.FindAsync(id);
 
-        public async Task<int> RemoveAsync(Animal entity)
+        public async Task<int> RemoveAsync(long id)
         {
-            _applicationDbContext.Animals.Remove(entity);
-            return await _applicationDbContext.SaveChangesAsync();
+            Animal entity = new() { Id = id };
+            
+            _applicationDbContext.Animals
+                .Remove(entity);
+            
+            return await _applicationDbContext
+                .SaveChangesAsync();
         }
 
         public async Task<IEnumerable<AnimalVisitedLocation>> SearchAnimalVisitedLocationsAsync(
@@ -38,8 +43,8 @@ namespace Application.Services
             int from = 0,
             int size = 10)
         {
-            var query = _applicationDbContext.AnimalVisitedLocations
-                .Where(x => x.AnimalId == animalId);
+            var query = _applicationDbContext.AnimalVisitedLocations.Where(x => x.AnimalId == animalId);
+           
             if(filter.StartDateTime != null)
                 query.Where(x => x.DateTimeOfVisitLocationPoint == filter.StartDateTime);
             if(filter.EndDateTime != null)

@@ -1,7 +1,7 @@
 ﻿using Application.Abstractions.Interfaces;
 using AutoMapper;
 using Domain.Entities;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.DTOs.LocationPoint;
 
@@ -10,8 +10,9 @@ namespace WebApi.Controllers
     [Route("locations")]
     [Produces("application/json")]
     [ApiController]
-    public class LocationPointsController
-        : ControllerBase
+    [Authorize]
+    public class LocationPointsController :
+        ControllerBase
     {
         private readonly ILogger<LocationPointsController> _logger;
         private readonly ILocationPointService _locationPointService;
@@ -27,11 +28,9 @@ namespace WebApi.Controllers
             _mapper = mapper;
         }
 
-
         [HttpGet("{pointId:long}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GetLocationPointDto>> Get(long pointId)
         {
             if(pointId <= 0)
@@ -45,16 +44,17 @@ namespace WebApi.Controllers
 
             var result = _mapper
                 .Map<GetLocationPointDto>(point);
-            
+
             return Ok(result);
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<GetLocationPointDto>> Post(CreateLocationPointDto createPointDto)
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<ActionResult<GetLocationPointDto>> Create(CreateLocationPointDto createPointDto)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid == false) 
                 return BadRequest();
 
             var point = _mapper
@@ -66,7 +66,45 @@ namespace WebApi.Controllers
             var result = _mapper
                 .Map<GetLocationPointDto>(point);
             
-            return Created(HttpContext.Request.PathBase + $@"/{point.Id}", result);
+            return Created($@"locations/{point.Id}", result);
+        }
+
+        [HttpPut("{pointId:long}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<ActionResult<GetLocationPointDto>> Update(
+            long pointId,
+            CreateLocationPointDto updatePointDto)
+        {
+            if(ModelState.IsValid == false || pointId <= 0)
+                return BadRequest();
+
+            var point = _mapper
+                .Map<LocationPoint>(updatePointDto);
+            point.Id = pointId;
+
+            await _locationPointService
+                .UpdateAsync(point);
+
+            var result = _mapper
+                .Map<GetLocationPointDto>(point);
+
+            return Ok(result);
+        }
+
+        [HttpDelete("{pointId:long}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Delete(long pointId)
+        {
+            if(pointId <= 0)
+                return BadRequest();
+
+            await _locationPointService
+                .RemoveAsync(pointId);
+
+            return Ok();
         }
     }
 }

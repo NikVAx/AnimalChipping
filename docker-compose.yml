@@ -27,7 +27,7 @@ services:
       - webapi
     environment:
       SERVER_URL: http://webapi:80
-      STAGE: 0
+      STAGE: 2
 
   pgadmin:
     image: dpage/pgadmin4:6.20

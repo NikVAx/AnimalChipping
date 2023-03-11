@@ -1,9 +1,8 @@
 ﻿using Application.Abstractions.Interfaces;
 using Application.DTOs;
 using Domain.Entities;
-using Microsoft.AspNetCore.Identity;
+using Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Principal;
 
 namespace Application.Services
 {
@@ -12,14 +11,17 @@ namespace Application.Services
     {
 
         private readonly IApplicationDbContext _applicationDbContext;
-        private readonly IPasswordHasher<Account> _passwordHasher;
 
         public AccountService(
-            IApplicationDbContext applicationDbContext, 
-            IPasswordHasher<Account> passwordHasher)
+            IApplicationDbContext applicationDbContext)
         {
             _applicationDbContext = applicationDbContext;
-            _passwordHasher = passwordHasher;
+        }
+
+        public async Task<Account?> GetByEmailAsync(string email)
+        {
+            return await _applicationDbContext.Account
+                .FirstOrDefaultAsync(x => x.Email == email);
         }
 
         public async Task<Account?> GetByIdAsync(int id)
@@ -27,14 +29,20 @@ namespace Application.Services
             return await _applicationDbContext.Account.FindAsync(id);
         }
 
-        // TODO: Separate account and account.password to different objects (e.g. like AccountData and Credentials) for registration action 
-
         public async Task<int> RegisterAsync(Account account)
         {
-            var password = _passwordHasher.HashPassword(account, account.Password);
-            account.Password = password;
-            _applicationDbContext.Account.Add(account);
-            return await _applicationDbContext.SaveChangesAsync();
+            try
+            {
+                _applicationDbContext.Account
+                    .Add(account);
+
+                return await _applicationDbContext
+                    .SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new ConflictException($"Account with email {account.Email} is already exist", ex);
+            }
         }
 
         public async Task<int> RemoveAsync(Account entity)
