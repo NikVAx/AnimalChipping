@@ -38,7 +38,9 @@ namespace WebApi.Handlers
             }
 
             var auth = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
-            var bytes = Convert.FromBase64String(auth.Parameter);
+            byte[]? bytes = Convert.FromBase64String(auth.Parameter);
+            
+
             string[] credentials = Encoding.UTF8.GetString(bytes).Split(":");
 
             var email = credentials[0];

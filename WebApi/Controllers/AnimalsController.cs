@@ -63,7 +63,7 @@ namespace WebApi.Controllers
             var result = _mapper
                 .Map<GetAnimalDto>(animal);
 
-            return Ok(result);
+            return Created($"animals/{animal.Id}", result);
         }
         
         [HttpGet("{animalId:long}/locations")]

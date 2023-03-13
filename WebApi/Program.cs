@@ -1,5 +1,6 @@
 using Data;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using WebApi.AutoMapper;
 using WebApi.Filters;
@@ -23,8 +24,6 @@ namespace WebApi
             {
                 options.Filters.Add<ExceptionFilterAttribute>();
             });
-
-            
 
             builder.Services.AddCors();
             builder.Services.AddEndpointsApiExplorer(); // https://aka.ms/aspnetcore/swashbuckle
