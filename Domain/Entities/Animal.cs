@@ -14,7 +14,7 @@ namespace Domain.Entities
         public float Height { get; set; }
         public Gender Gender { get; set; }
         public LifeStatus LifeStatus { get; set; }
-        public DateTime ChippingDateTime { get; set; }
-        public DateTime? DeathDateTime { get; set; } = null;
+        public DateTimeOffset ChippingDateTime { get; set; }
+        public DateTimeOffset? DeathDateTime { get; set; } = null;
     }
 }

@@ -8,11 +8,9 @@ namespace Application.Abstractions.Interfaces
     {
         public Task<Account?> GetByIdAsync(int id);
         public Task<Account?> GetByEmailAsync(string email);
-        public Task<IEnumerable<Account>> SearchAsync(AccountFilter filter, int from = 0, int size = 10);
-        
+        public Task<IEnumerable<Account>> SearchAsync(AccountFilter filter, int from = 0, int size = 10); 
         public Task<int> RegisterAsync(Account account); 
         public PasswordVerificationResult VerifyPassword(Account account, string password);
-        
         public Task<int> UpdateAsync(Account entity);
         public Task<int> DeleteAsync(int id);
     }

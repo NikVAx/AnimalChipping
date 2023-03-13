@@ -31,9 +31,32 @@ namespace WebApi.Controllers
         }
 
 
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<GetAnimalDto>>> Search(
+            [FromQuery] AnimalFilterDto filterDto,
+            int from = 0,
+            int size = 10)
+        {
+
+            if(ModelState.IsValid == false || from < 0 || size <= 0)
+                return BadRequest();
+
+            var filter = _mapper
+                .Map<AnimalFilter>(filterDto);
+
+            var animals = await _animalService
+                .SearchAsync(filter, from, size);
+
+            var result = animals
+                .Select(animal => _mapper
+                    .Map<GetAnimalDto>(animal));
+
+            return Ok(result);
+        }
+
         [HttpGet("{animalId:long}")]
         public async Task<ActionResult<GetAnimalDto>> Get(
-            long animalId)
+    long animalId)
         {
             if(animalId <= 0)
                 return BadRequest();
@@ -66,46 +89,9 @@ namespace WebApi.Controllers
             return Created($"animals/{animal.Id}", result);
         }
         
-        [HttpGet("{animalId:long}/locations")]
-        public async Task<ActionResult<IEnumerable<GetVisitedLocationPointDto>>> GetLocations(
-            long animalId,
-            [FromQuery] LocationFilterDto filterDto,
-            int from = 0,
-            int size = 10)
-        {
-            if(ModelState.IsValid == false || from < 0 || size <= 0)
-                return BadRequest();
 
-            var filter = _mapper
-                .Map<LocationFilter>(filterDto);
 
-            var result = await _animalService
-                .SearchAnimalVisitedLocationsAsync(animalId, filter, from, size);
 
-            return Ok(result);
-        }
 
-        [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<GetAnimalDto>>> Search(
-            [FromQuery] AnimalFilterDto filterDto,
-            int from = 0,
-            int size = 10)
-        {
-
-           if(ModelState.IsValid == false || from < 0 || size <= 0)
-               return BadRequest();
-
-            var filter = _mapper
-                .Map<AnimalFilter>(filterDto);
-
-            var animals = await _animalService
-                .SearchAsync(filter, from, size);
-
-            var result = animals
-                .Select(animal => _mapper
-                    .Map<GetAnimalDto>(animal));
-            
-            return Ok(result);
-        }
     }
 }

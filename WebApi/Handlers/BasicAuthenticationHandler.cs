@@ -32,39 +32,43 @@ namespace WebApi.Handlers
         {
             var errorMessage = "Invalid email or password";
 
-            if(!Request.Headers.ContainsKey("Authorization"))
+            if(Request.Headers.ContainsKey("Authorization") == false)
             {
                 return AnonymousAuthenticateResult();
             }
 
-            var auth = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
-            byte[]? bytes = Convert.FromBase64String(auth.Parameter);
-            
+            AuthenticationHeaderValue auth = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
 
-            string[] credentials = Encoding.UTF8.GetString(bytes).Split(":");
-
-            var email = credentials[0];
-            var password = credentials[1];
-
-            var account = await _accountService
-                .GetByEmailAsync(email);
-
-            if(account == null)
+            if(auth.Parameter != null)
             {
-                return AuthenticateResult.Fail(errorMessage);
-            }
+                byte[] bytes = Convert.FromBase64String(auth.Parameter);
 
-            if(_accountService.VerifyPassword(account, password) == PasswordVerificationResult.Success)
-            {
-                var claims = new[]
+
+                string[] credentials = Encoding.UTF8.GetString(bytes).Split(":");
+
+                var email = credentials[0];
+                var password = credentials[1];
+
+                var account = await _accountService
+                    .GetByEmailAsync(email);
+
+                if(account == null)
                 {
-                    new Claim(ClaimTypes.Email, email),
-                    new Claim("Id", account.Id.ToString())
-                };
+                    return AuthenticateResult.Fail(errorMessage);
+                }
 
-                var ticket = CreateTicket(claims);
-                return AuthenticateResult.Success(ticket);
+                if(_accountService.VerifyPassword(account, password) == PasswordVerificationResult.Success)
+                {
+                    var claims = new[]
+                    {
+                        new Claim("Id", account.Id.ToString())
+                    };
+
+                    var ticket = CreateTicket(claims);
+                    return AuthenticateResult.Success(ticket);
+                }
             }
+            
 
             return AuthenticateResult.Fail(errorMessage);
         }
@@ -81,7 +85,7 @@ namespace WebApi.Handlers
 
             var claims = new[]
             {
-                    new Claim(ClaimTypes.Anonymous, "Anonymous")
+                new Claim(ClaimTypes.Anonymous, "Anonymous")
             };
 
             return AuthenticateResult.Success( CreateTicket(claims) );

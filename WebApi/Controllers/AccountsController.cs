@@ -70,45 +70,48 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost("/registration")]
-        public async Task<ActionResult<GetAccountDto>> Register(RegisterUpdateAccountDto registerDto)
-        {
-            if(ModelState.IsValid == false)
-                return BadRequest();
-
-            var account = _mapper
-                .Map<Account>(registerDto);
-
-            await _accountService
-                .RegisterAsync(account);
-
-            var result = _mapper
-                .Map<GetAccountDto>(account);
-
-            return Created(@$"accounts/{result.Id}", result);
-        }
-
         [HttpPut("{accountId:int}")]
         public async Task<ActionResult<GetAccountDto>> Update(
             int accountId,
             RegisterUpdateAccountDto updateAccountDto)
         {
-            var idString = User.FindFirstValue("Id");
-            int? id = string.IsNullOrEmpty(idString) ? null : Convert.ToInt32(idString);
-            if(accountId != id)
+            string id = User.FindFirstValue("Id");
+
+            //var idString = User.FindFirstValue("Id");
+            //int? id = string.IsNullOrEmpty(idString) ? null : Convert.ToInt32(idString);
+            //if(accountId != id)
+            //    return Forbid();
+            //
+            //var account = _mapper
+            //    .Map<Account>(updateAccountDto);
+            //
+            //account.Id = accountId;
+            //
+            //await _accountService
+            //    .UpdateAsync(account);
+            //
+            //var result = _mapper
+            //    .Map<GetAccountDto>(account);
+            //
+            //return Ok(result);
+
+            var account = await _accountService
+                .GetByIdAsync(accountId);
+
+            if(account == null || Convert.ToInt32(id) != accountId)
                 return Forbid();
-            
-            var account = _mapper
-                .Map<Account>(updateAccountDto);
-            
-            account.Id = accountId;
-            
+
+            account.FirstName = updateAccountDto.FirstName;
+            account.LastName  = updateAccountDto.LastName;
+            account.Email     = updateAccountDto.Email;
+            account.Password  = updateAccountDto.Password;
+
             await _accountService
                 .UpdateAsync(account);
-            
+
             var result = _mapper
                 .Map<GetAccountDto>(account);
-            
+
             return Ok(result);
         }
 
@@ -117,6 +120,17 @@ namespace WebApi.Controllers
         {
             if(accountId <= 0)
                 return BadRequest();
+
+            var id = User.FindFirstValue("Id");
+
+            //if(id == null)
+            //    return Unauthorized();
+
+            var account = await _accountService
+                .GetByIdAsync(accountId);
+
+            if(account == null || Convert.ToInt32(id) != accountId)
+                return Forbid();
 
             await _accountService
                 .DeleteAsync(accountId);

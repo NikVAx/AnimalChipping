@@ -41,26 +41,8 @@ namespace Application.Services
                 .SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<AnimalVisitedLocation>> SearchAnimalVisitedLocationsAsync(
-            long animalId,
-            LocationFilter filter,
-            int from = 0,
-            int size = 10)
-        {
-            var query = _applicationDbContext.AnimalVisitedLocations.Where(x => x.AnimalId == animalId);
-           
-            if(filter.StartDateTime != null)
-                query.Where(x => x.DateTimeOfVisitLocationPoint == filter.StartDateTime);
-            if(filter.EndDateTime != null)
-                query.Where(x => x.DateTimeOfVisitLocationPoint == filter.EndDateTime);
-
-            return await query.Skip(from).Take(size)
-                .OrderBy(x => x.DateTimeOfVisitLocationPoint)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Animal>> SearchAsync(DateTime? startDateTime,
-            DateTime? endDateTime, int? chipperId, long? chippingLocationId,
+        public async Task<IEnumerable<Animal>> SearchAsync(DateTimeOffset? startDateTime,
+            DateTimeOffset? endDateTime, int? chipperId, long? chippingLocationId,
             LifeStatus? lifeStatus, Gender? gender, int from = 0, int size = 10)
         {
             var query = _applicationDbContext.Animals.AsQueryable();

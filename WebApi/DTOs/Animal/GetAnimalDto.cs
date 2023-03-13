@@ -14,7 +14,8 @@ namespace WebApi.DTOs.Animal
         public IEnumerable<long> VisitedLocations { get; set; }
         public Gender Gender { get; set; }
         public LifeStatus LifeStatus { get; set; }
-        public DateTime ChippingDateTime { get; set; }
-        public DateTime? DeathDateTime { get; set; }
+        
+        public DateTimeOffset ChippingDateTime { get; set; }
+        public DateTimeOffset? DeathDateTime { get; set; }
     }
 }

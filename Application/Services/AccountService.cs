@@ -4,6 +4,7 @@ using Domain.Entities;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Principal;
 
 namespace Application.Services
 {
@@ -35,7 +36,11 @@ namespace Application.Services
 
         public async Task<Account?> GetByIdAsync(int id)
         {
-            return await _applicationDbContext.Account.FindAsync(id);
+            var account = await _applicationDbContext.Account.FindAsync(id);
+            if(account != null)
+                _applicationDbContext.Account
+                    .Entry(account).State = EntityState.Detached;
+            return account;
         }
 
         public async Task<int> DeleteAsync(int id)
@@ -68,18 +73,20 @@ namespace Application.Services
                 query.Where(x => x.Email.Contains(filter.Email, StringComparison.OrdinalIgnoreCase));
 
             return await query
-                .OrderBy(x => x.Id)
                 .Skip(from)
                 .Take(size)
                 .ToListAsync();
         }
 
-        public async Task<int> UpdateAsync(Account entity)
+        public async Task<int> UpdateAsync(Account account)
         {
             try
             {
+                account.Password = _passwordHasher
+                    .HashPassword(account, account.Password);
+
                 _applicationDbContext.Account
-                    .Update(entity);
+                    .Update(account);
 
                 return await _applicationDbContext
                     .SaveChangesAsync();
