@@ -18,20 +18,20 @@ namespace WebApi.AutoMapper
                     opts.MapFrom(src => src.AnimalTypes.Select(x => x.Id)))
                 .ForMember(dest => dest.VisitedLocations, opts =>
                     opts.MapFrom(src => src.VisitedLocations.Select(x => x.Id)));
-            CreateMap<CreateAnimalDto, Animal>();
+            CreateMap<CreateUpdateAnimalDto, Animal>();
             CreateMap<AnimalFilterDto, AnimalFilter>();
 
             CreateMap<LocationFilterDto, LocationFilter>();
 
             CreateMap<LocationPoint, GetLocationPointDto>();
-            CreateMap<CreateLocationPointDto, LocationPoint>();
+            CreateMap<CreateUpdateLocationPointDto, LocationPoint>();
             
             CreateMap<AnimalType, GetAnimalTypeDto>();
-            CreateMap<CreateAnimalTypeDto, AnimalType>();
+            CreateMap<CreateUpdateAnimalTypeDto, AnimalType>();
 
             CreateMap<AccountFilterDto, AccountFilter>();
             CreateMap<Account, GetAccountDto>();
-            CreateMap<RegisterAccountDto, Account>();
+            CreateMap<RegisterUpdateAccountDto, Account>();
         }
         
     }

@@ -31,7 +31,8 @@ namespace WebApi.Controllers
         [HttpGet("{pointId:long}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<GetLocationPointDto>> Get(long pointId)
+        public async Task<ActionResult<GetLocationPointDto>> Get(
+            long pointId)
         {
             if(pointId <= 0)
                 return BadRequest();
@@ -52,7 +53,8 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<GetLocationPointDto>> Create(CreateLocationPointDto createPointDto)
+        public async Task<ActionResult<GetLocationPointDto>> Create(
+            CreateUpdateLocationPointDto createPointDto)
         {
             if (ModelState.IsValid == false) 
                 return BadRequest();
@@ -61,7 +63,7 @@ namespace WebApi.Controllers
                 .Map<LocationPoint>(createPointDto);
 
             await _locationPointService
-                .AddAsync(point);
+                .CreateAsync(point);
 
             var result = _mapper
                 .Map<GetLocationPointDto>(point);
@@ -75,13 +77,14 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult<GetLocationPointDto>> Update(
             long pointId,
-            CreateLocationPointDto updatePointDto)
+            CreateUpdateLocationPointDto updatePointDto)
         {
             if(ModelState.IsValid == false || pointId <= 0)
                 return BadRequest();
 
             var point = _mapper
                 .Map<LocationPoint>(updatePointDto);
+            
             point.Id = pointId;
 
             await _locationPointService
@@ -96,13 +99,14 @@ namespace WebApi.Controllers
         [HttpDelete("{pointId:long}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Delete(long pointId)
+        public async Task<ActionResult> Delete(
+            long pointId)
         {
             if(pointId <= 0)
                 return BadRequest();
 
             await _locationPointService
-                .RemoveAsync(pointId);
+                .DeleteAsync(pointId);
 
             return Ok();
         }

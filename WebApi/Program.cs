@@ -29,22 +29,15 @@ namespace WebApi
             builder.Services.AddCors();
             builder.Services.AddEndpointsApiExplorer(); // https://aka.ms/aspnetcore/swashbuckle
 
-            builder.Services.AddSwaggerGen(options =>
-            {
-                options.DescribeAllParametersInCamelCase();
-                options.AddSecurityDefinition("basic", new OpenApiSecurityScheme()
-                {
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Scheme = "basic",
-                    Type = SecuritySchemeType.Http
-                });
-            });
-
             builder.Services.AddAuthentication("BasicAuthentication")
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
-            //builder.Services.AddAuthorization();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.DescribeAllParametersInCamelCase();
+            });
+
+            builder.Services.AddAuthorization();
 
 
             var app = builder.Build();
@@ -69,7 +62,6 @@ namespace WebApi
             app.MapControllers();
 
             app.Run();
-
         }
     }
 }

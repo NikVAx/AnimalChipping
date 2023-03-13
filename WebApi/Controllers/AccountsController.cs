@@ -4,6 +4,7 @@ using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebApi.DTOs.Account;
 
 namespace WebApi.Controllers
@@ -70,7 +71,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("/registration")]
-        public async Task<ActionResult<GetAccountDto>> Register(RegisterAccountDto registerDto)
+        public async Task<ActionResult<GetAccountDto>> Register(RegisterUpdateAccountDto registerDto)
         {
             if(ModelState.IsValid == false)
                 return BadRequest();
@@ -86,5 +87,42 @@ namespace WebApi.Controllers
 
             return Created(@$"accounts/{result.Id}", result);
         }
+
+        [HttpPut("{accountId:int}")]
+        public async Task<ActionResult<GetAccountDto>> Update(
+            int accountId,
+            RegisterUpdateAccountDto updateAccountDto)
+        {
+            var idString = User.FindFirstValue("Id");
+            int? id = string.IsNullOrEmpty(idString) ? null : Convert.ToInt32(idString);
+            if(accountId != id)
+                return Forbid();
+            
+            var account = _mapper
+                .Map<Account>(updateAccountDto);
+            
+            account.Id = accountId;
+            
+            await _accountService
+                .UpdateAsync(account);
+            
+            var result = _mapper
+                .Map<GetAccountDto>(account);
+            
+            return Ok(result);
+        }
+
+        [HttpDelete("{accountId:int}")]
+        public async Task<ActionResult> Delete(int accountId)
+        {
+            if(accountId <= 0)
+                return BadRequest();
+
+            await _accountService
+                .DeleteAsync(accountId);
+
+            return Ok();
+        }
+    
     }
 }

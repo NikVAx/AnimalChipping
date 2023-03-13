@@ -16,7 +16,7 @@ namespace Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-            Database.EnsureCreated();
+
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -35,7 +35,8 @@ namespace Data
                    .WithMany();
 
             builder.Entity<Account>()
-                   .HasAlternateKey(x => x.Email);
+                   .HasIndex(x => x.Email)
+                   .IsUnique();
             
             builder.Entity<AnimalType>()
                    .HasIndex(x => x.Type)

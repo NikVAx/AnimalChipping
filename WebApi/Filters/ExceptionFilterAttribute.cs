@@ -20,8 +20,11 @@ namespace WebApi.Filters
                     context.Result = new NotFoundObjectResult(context.Exception.Message);
                     break;
 
+                case ForbiddenException:
+                    context.Result = new ForbidResult("BasicAuthentication");
+                    break;
+
                 default:
-                    //context.Result = new StatusCodeResult(StatusCodes.Status500InternalServerError);
                     context.ExceptionHandled = false;
                     return;
             }

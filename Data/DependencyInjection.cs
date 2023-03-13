@@ -16,6 +16,7 @@ namespace Data
 
             services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
             {
+                options.EnableSensitiveDataLogging();
                 options.UseNpgsql(connectionString);
             });
 

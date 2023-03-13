@@ -2,7 +2,7 @@
 
 namespace WebApi.DTOs.LocationPoint
 {
-    public class CreateLocationPointDto
+    public class CreateUpdateLocationPointDto
     {
         [Range(-90.00, 90.00)]
         [Required]

@@ -1,9 +1,8 @@
 ﻿using Application.Abstractions.Interfaces;
 using AutoMapper;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.DTOs.Animal;
 using WebApi.DTOs.AnimalType;
 
 namespace WebApi.Controllers
@@ -30,7 +29,10 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("{typeId:long}")]
-        public async Task<ActionResult<GetAnimalTypeDto>> Get(long typeId)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<GetAnimalTypeDto>> Get(
+            long typeId)
         {
             if(typeId <= 0)
                 return BadRequest();
@@ -46,5 +48,68 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<ActionResult<GetAnimalTypeDto>> Create(
+            CreateUpdateAnimalTypeDto createTypeDto)
+        {
+            if(ModelState.IsValid == false)
+                return BadRequest();
+
+            var animalType = _mapper
+                .Map<AnimalType>(createTypeDto);
+
+            await _animalTypeService
+                .CreateAsync(animalType);
+
+            var result = _mapper
+                .Map<GetAnimalTypeDto>(animalType);
+
+            return Created($@"animals/types/{result.Id}", result);
+        }
+
+        [HttpPut("{typeId:long}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<ActionResult<GetAnimalTypeDto>> Update(
+            long typeId,
+            CreateUpdateAnimalTypeDto updateTypeDto)
+        {
+            if(ModelState.IsValid == false || typeId <= 0)
+                return BadRequest();
+
+            var type = _mapper
+                .Map<AnimalType>(updateTypeDto);
+
+            type.Id = typeId;
+
+            await _animalTypeService
+                .UpdateAsync(type);
+
+            var result = _mapper
+                .Map<GetAnimalTypeDto>(type);
+
+            return Ok(result);
+        }
+       
+        [HttpDelete("{typeId:long}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Delete(
+            long typeId)
+        {
+            if(typeId <= 0)
+                return BadRequest();
+
+            await _animalTypeService
+                .DeleteAsync(typeId);
+
+            return Ok();
+        }
+
     }
 }

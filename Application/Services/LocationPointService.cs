@@ -1,10 +1,7 @@
 ﻿using Application.Abstractions.Interfaces;
-using Application.DTOs;
 using Domain.Entities;
 using Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Principal;
-using System.Threading;
 
 namespace Application.Services
 {
@@ -24,7 +21,7 @@ namespace Application.Services
                 .FindAsync(id);
         }
 
-        public async Task<int> AddAsync(LocationPoint entity)
+        public async Task<int> CreateAsync(LocationPoint entity)
         {
             try
             {
@@ -33,7 +30,7 @@ namespace Application.Services
             }
             catch(DbUpdateException ex)
             {
-                throw new ConflictException($"Location point whit Latitude {entity.Latitude} and Longitude {entity.Longitude} is already exist", ex);
+                throw new ConflictException($"LocationPoint with Latitude {entity.Latitude} and Longitude {entity.Longitude} is already exist", ex);
             }
         }
 
@@ -49,19 +46,15 @@ namespace Application.Services
             }
             catch(DbUpdateConcurrencyException ex)
             {
-                throw new NotFoundException($"Location point with id {entity.Id} not found", ex);
+                throw new NotFoundException($"LocationPoint with Id {entity.Id} not found", ex);
             }
             catch(DbUpdateException ex)
             {
-                throw new ConflictException($"Location point whit Latitude {entity.Latitude} and Longitude {entity.Longitude} is already exist", ex);
-            } 
-            catch (Exception ex)
-            {
-                throw new Exception("Rethrown exception", ex);
-            }     
+                throw new ConflictException($"LocationPoint with Latitude {entity.Latitude} and Longitude {entity.Longitude} is already exist", ex);
+            }  
         }
 
-        public async Task<int> RemoveAsync(long id)
+        public async Task<int> DeleteAsync(long id)
         {
             try
             {
@@ -75,7 +68,7 @@ namespace Application.Services
             }
             catch(DbUpdateConcurrencyException ex)
             {
-                throw new NotFoundException($"Location point with id {id} not found", ex);
+                throw new NotFoundException($"LocationPoint with Id {id} not found", ex);
             }
         }
     }

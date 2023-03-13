@@ -1,5 +1,7 @@
 ﻿using Application.Abstractions.Interfaces;
 using Domain.Entities;
+using Domain.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
@@ -13,32 +15,64 @@ namespace Application.Services
             _applicationDbContext = applicationDbContext;
         }
 
-        public async Task<int> AddAsync(AnimalType entity)
+        public async Task<AnimalType?> GetByIdAsync(long id)
         {
-            _applicationDbContext.AnimalTypes.Add(entity);
-            return await _applicationDbContext.SaveChangesAsync();
+            return await _applicationDbContext.AnimalTypes
+                .FindAsync(id);
+        }
+
+        public async Task<int> CreateAsync(AnimalType entity)
+        {
+            try
+            {
+                _applicationDbContext.AnimalTypes
+                    .Add(entity);
+
+                return await _applicationDbContext
+                    .SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new ConflictException($"AnimalType with Type {entity.Type} is already exist", ex);
+            }
         }
 
         public async Task<int> UpdateAsync(AnimalType entity)
         {
-            _applicationDbContext.AnimalTypes.Update(entity);
-            return await _applicationDbContext.SaveChangesAsync();
+            try
+            {
+                _applicationDbContext.AnimalTypes
+                    .Update(entity);
+
+                return await _applicationDbContext
+                    .SaveChangesAsync();
+            }
+            catch(DbUpdateConcurrencyException ex)
+            {
+                throw new NotFoundException($"AnimalType with Id {entity.Id} not found", ex);
+            }
+            catch(DbUpdateException ex)
+            {
+                throw new ConflictException($"AnimalType with Type {entity.Type} is already exist", ex);
+            }
         }
 
-        public async Task<int> RemoveAsync(long id)
+        public async Task<int> DeleteAsync(long id)
         {
-            AnimalType entity = new() { Id = id };
+            try
+            {
+                AnimalType entity = new() { Id = id };
 
-            _applicationDbContext.AnimalTypes
-                .Remove(entity);
+                _applicationDbContext.AnimalTypes
+                    .Remove(entity);
 
-            return await _applicationDbContext
-                .SaveChangesAsync();
-        }
-
-        public async Task<AnimalType?> GetByIdAsync(long id)
-        {
-            return await _applicationDbContext.AnimalTypes.FindAsync(id);
+                return await _applicationDbContext
+                    .SaveChangesAsync();
+            }
+            catch(DbUpdateConcurrencyException ex)
+            {
+                throw new NotFoundException($"AnimalType with Id {id} not found", ex);
+            }
         }
     }
 }

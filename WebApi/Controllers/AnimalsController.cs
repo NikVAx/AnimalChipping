@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Interfaces;
 using Application.DTOs;
 using AutoMapper;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.DTOs.Animal;
@@ -31,7 +32,8 @@ namespace WebApi.Controllers
 
 
         [HttpGet("{animalId:long}")]
-        public async Task<ActionResult<GetAnimalDto>> Get(long animalId)
+        public async Task<ActionResult<GetAnimalDto>> Get(
+            long animalId)
         {
             if(animalId <= 0)
                 return BadRequest();
@@ -48,6 +50,21 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        public async Task<ActionResult<GetAnimalDto>> Create(
+            CreateUpdateAnimalDto createAnimalDto)
+        {
+            var animal = _mapper
+                .Map<Animal>(createAnimalDto);
+
+            await _animalService
+                .CreateAsync(animal);
+
+            var result = _mapper
+                .Map<GetAnimalDto>(animal);
+
+            return Ok(result);
+        }
         
         [HttpGet("{animalId:long}/locations")]
         public async Task<ActionResult<IEnumerable<GetVisitedLocationPointDto>>> GetLocations(

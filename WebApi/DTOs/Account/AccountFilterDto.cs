@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using System.Xml.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace WebApi.DTOs.Account
 {
@@ -10,7 +8,7 @@ namespace WebApi.DTOs.Account
         
         public string? LastName { get; set; }
 
-        [EmailAddress]
+        //[EmailAddress]
         public string? Email { get; set; }
     }
 }

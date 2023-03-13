@@ -2,6 +2,7 @@
 using Application.DTOs;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Exceptions;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,16 +18,19 @@ namespace Application.Services
             _applicationDbContext = applicationDbContext;
         }
 
-        public async Task<int> AddAsync(Animal entity)
+        public async Task<int> CreateAsync(Animal entity)
         {
-            _applicationDbContext.Animals.Add(entity);
-            return await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Animals
+                .Add(entity);
+
+            return await _applicationDbContext
+                .SaveChangesAsync();
         }
 
         public async Task<Animal?> GetByIdAsync(long id)
             => await _applicationDbContext.Animals.FindAsync(id);
 
-        public async Task<int> RemoveAsync(long id)
+        public async Task<int> DeleteAsync(long id)
         {
             Animal entity = new() { Id = id };
             

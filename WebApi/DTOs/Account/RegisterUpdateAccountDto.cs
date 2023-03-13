@@ -2,7 +2,7 @@
 
 namespace WebApi.DTOs.Account
 {
-    public class RegisterAccountDto
+    public class RegisterUpdateAccountDto
     {
         [Required]
         public string FirstName { get; set; }

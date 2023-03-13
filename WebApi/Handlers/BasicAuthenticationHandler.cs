@@ -22,7 +22,6 @@ namespace WebApi.Handlers
             ILoggerFactory logger,
             UrlEncoder encoder,
             ISystemClock clock,
-            IApplicationDbContext applicationDbContext,
             IAccountService accountService) :
             base(options, logger, encoder, clock)
         {
@@ -53,11 +52,12 @@ namespace WebApi.Handlers
                 return AuthenticateResult.Fail(errorMessage);
             }
 
-            if(account.Password == password)
+            if(_accountService.VerifyPassword(account, password) == PasswordVerificationResult.Success)
             {
                 var claims = new[]
                 {
-                    new Claim(ClaimTypes.Email, email)
+                    new Claim(ClaimTypes.Email, email),
+                    new Claim("Id", account.Id.ToString())
                 };
 
                 var ticket = CreateTicket(claims);
@@ -76,14 +76,13 @@ namespace WebApi.Handlers
 
         private AuthenticateResult AnonymousAuthenticateResult()
         {
+
             var claims = new[]
             {
                     new Claim(ClaimTypes.Anonymous, "Anonymous")
             };
 
-            return AuthenticateResult.Success(
-                CreateTicket(claims)
-            );
+            return AuthenticateResult.Success( CreateTicket(claims) );
         }
 
 

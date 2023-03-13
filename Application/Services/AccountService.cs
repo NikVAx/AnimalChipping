@@ -2,6 +2,7 @@
 using Application.DTOs;
 using Domain.Entities;
 using Domain.Exceptions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
@@ -11,17 +12,25 @@ namespace Application.Services
     {
 
         private readonly IApplicationDbContext _applicationDbContext;
+        private readonly IPasswordHasher<Account> _passwordHasher;
 
         public AccountService(
-            IApplicationDbContext applicationDbContext)
+            IApplicationDbContext applicationDbContext,
+            IPasswordHasher<Account> passwordHasher)
         {
             _applicationDbContext = applicationDbContext;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<Account?> GetByEmailAsync(string email)
         {
-            return await _applicationDbContext.Account
+            var account = await _applicationDbContext.Account
                 .FirstOrDefaultAsync(x => x.Email == email);
+            if (account != null)
+                _applicationDbContext.Account
+                    .Entry(account).State = EntityState.Detached;
+            return account;
+
         }
 
         public async Task<Account?> GetByIdAsync(int id)
@@ -29,26 +38,22 @@ namespace Application.Services
             return await _applicationDbContext.Account.FindAsync(id);
         }
 
-        public async Task<int> RegisterAsync(Account account)
+        public async Task<int> DeleteAsync(int id)
         {
             try
             {
+                var entity = new Account() { Id = id };
+
                 _applicationDbContext.Account
-                    .Add(account);
+                    .Remove(entity);
 
                 return await _applicationDbContext
                     .SaveChangesAsync();
             }
-            catch (DbUpdateException ex)
+            catch(DbUpdateConcurrencyException ex)
             {
-                throw new ConflictException($"Account with email {account.Email} is already exist", ex);
+                throw new ForbiddenException("Forbidden", ex);
             }
-        }
-
-        public async Task<int> RemoveAsync(Account entity)
-        {
-            _applicationDbContext.Account.Remove(entity);
-            return await _applicationDbContext.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Account>> SearchAsync(AccountFilter filter, int from = 0, int size = 10)
@@ -71,8 +76,42 @@ namespace Application.Services
 
         public async Task<int> UpdateAsync(Account entity)
         {
-            _applicationDbContext.Account.Update(entity);
-            return await _applicationDbContext.SaveChangesAsync();
+            try
+            {
+                _applicationDbContext.Account
+                    .Update(entity);
+
+                return await _applicationDbContext
+                    .SaveChangesAsync();
+            }
+            catch(DbUpdateConcurrencyException ex)
+            {
+                throw new ForbiddenException("Forbidden", ex);
+            }
+        }
+
+        public async Task<int> RegisterAsync(Account account)
+        {
+            try
+            {
+                account.Password = _passwordHasher
+                    .HashPassword(account, account.Password);
+
+                _applicationDbContext.Account
+                    .Add(account);
+
+                return await _applicationDbContext
+                    .SaveChangesAsync();
+            }
+            catch(DbUpdateException ex)
+            {
+                throw new ConflictException($"Account with email {account.Email} is already exist", ex);
+            }
+        }
+
+        public PasswordVerificationResult VerifyPassword(Account account, string password)
+        {
+            return _passwordHasher.VerifyHashedPassword(account, account.Password, password);
         }
     }
 }
