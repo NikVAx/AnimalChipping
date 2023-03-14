@@ -18,5 +18,9 @@ namespace Domain.Entities
         public LifeStatus LifeStatus { get; set; }
         public DateTimeOffset ChippingDateTime { get; set; }
         public DateTimeOffset? DeathDateTime { get; set; } = null;
+
+        public bool HasVisitedLocations()
+            => VisitedLocations != null && VisitedLocations.Any();
+        
     }
 }

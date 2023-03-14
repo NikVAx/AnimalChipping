@@ -47,11 +47,13 @@ namespace WebApi.Controllers
             var result = points.Select(animalVisitedLocation => _mapper
                 .Map<GetVisitedLocationPointDto>(animalVisitedLocation));
 
-            // TODO: add mapping to result type
             return Ok(result);
         }
 
         [HttpPost("locations/{pointId:long}")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GetVisitedLocationPointDto>> AddLocation(
             long animalId,
             long pointId)
@@ -76,21 +78,22 @@ namespace WebApi.Controllers
             if(animalId <= 0 || pointId <= 0)
                 return BadRequest();
 
+            throw new NotImplementedException();
             return new GetVisitedLocationPointDto();
         }
 
-        [HttpDelete("locations/{pointId:long}")]
-        public async Task<ActionResult<GetVisitedLocationPointDto>> DeleteLocation(
+        [HttpDelete("locations/{visitedPointId:long}")]
+        public async Task<ActionResult> DeleteLocation(
             long animalId,
             long visitedPointId)
         {
             if(animalId <= 0 || visitedPointId <= 0)
                 return BadRequest();
 
-            return new GetVisitedLocationPointDto();
+            await _animalLocationPointService
+                .RemoveAsync(animalId, visitedPointId);
+
+            return Ok();
         }
-
-
-
     }
 }

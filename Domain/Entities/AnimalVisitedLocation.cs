@@ -7,5 +7,6 @@
         public long AnimalId { get; set; }
         public DateTimeOffset DateTimeOfVisitLocationPoint { get; set; }
         public LocationPoint LocationPoint { get; set; } = null!;
+        public Animal Animal { get; set; }
     }
 }

@@ -92,14 +92,18 @@ namespace Application.Services
             if(options.Gender != null)
                 query = query.Where(x => x.Gender == options.Gender);
 
-            return await query.Skip(from).Take(size).ToListAsync();
+            return await query
+                .Skip(from)
+                .Take(size)
+                .Include(x => x.AnimalTypes)
+                .Include(x => x.VisitedLocations)
+                .ToListAsync();
         }
 
         public async Task<int> UpdateAsync(Animal entity)
         {
             try
             {
-
                 var animal = await _applicationDbContext
                     .Animals.FindAsync(entity.Id);
 

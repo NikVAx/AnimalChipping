@@ -25,14 +25,21 @@ namespace Data
                    .HasOne(x => x.Chipper)
                    .WithMany()
                    .HasForeignKey(x => x.ChipperId);
-            
-           //builder.Entity<Animal>()
-           //       .HasMany(x => x.AnimalTypes)
-           //       .WithMany(x => x.Animals);
 
             builder.Entity<Animal>()
-                   .HasMany(x => x.VisitedLocations)
-                   .WithMany();
+                   .HasMany(a => a.AnimalTypes)
+                   .WithMany(at => at.Animals);
+
+            builder.Entity<AnimalVisitedLocation>()
+                   .HasOne(vl => vl.Animal)
+                   .WithMany(a => a.VisitedLocations)
+                   .HasForeignKey(vl => vl.AnimalId);
+
+            builder.Entity<AnimalVisitedLocation>()
+                   .HasOne(vl => vl.LocationPoint)
+                   .WithMany()
+                   .HasForeignKey(vl => vl.LocationPointId);
+
 
             builder.Entity<Account>()
                    .HasIndex(x => x.Email)
