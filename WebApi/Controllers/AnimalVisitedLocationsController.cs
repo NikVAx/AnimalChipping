@@ -42,7 +42,7 @@ namespace WebApi.Controllers
 
             var result = await _animalLocationPointService
                 .SearchAsync(animalId, filter, from, size);
-
+            // TODO: add mapping to result type
             return Ok(result);
         }
 
@@ -54,7 +54,13 @@ namespace WebApi.Controllers
             if(animalId <= 0 || pointId <= 0)
                 return BadRequest();
 
-            return new GetVisitedLocationPointDto();
+            var location = await _animalLocationPointService
+                .AddAsync(animalId, pointId);
+
+            var result = _mapper
+                .Map<GetVisitedLocationPointDto>(location);
+
+            return Created("animals/{animalId}/locations", result);
         }
 
         [HttpPut("locations")]

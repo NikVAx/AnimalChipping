@@ -20,11 +20,34 @@ namespace Application.Services
 
         public async Task<int> CreateAsync(Animal entity)
         {
-            _applicationDbContext.Animals
-                .Add(entity);
+            //try
+            {
+                var types = new List<AnimalType>();
 
-            return await _applicationDbContext
-                .SaveChangesAsync();
+                foreach(var type in entity.AnimalTypes)
+                {
+                    var found = await _applicationDbContext.AnimalTypes
+                        .FindAsync(type.Id);
+
+                    if(found == null)
+                        throw new NotFoundException($"AnimalType with Id {type.Id} is not found");
+
+                    types.Add(found);
+                }
+
+                entity.AnimalTypes = types.ToArray();
+                entity.ChippingDateTime = DateTimeOffset.UtcNow;
+
+                _applicationDbContext.Animals
+                    .Add(entity);
+
+                return await _applicationDbContext
+                    .SaveChangesAsync();
+            }
+            //catch (DbUpdateException ex)
+            //{
+            //    //throw new NotFoundException($"Account with Id {entity.Id} is not found", ex);
+            //}
         }
 
         public async Task<Animal?> GetByIdAsync(long id)
@@ -68,17 +91,17 @@ namespace Application.Services
             var query = _applicationDbContext.Animals.AsQueryable();
 
             if(options.StartDateTime != null)
-                query.Where(x => x.ChippingDateTime >= options.StartDateTime);
+                query = query.Where(x => x.ChippingDateTime >= options.StartDateTime);
             if(options.EndDateTime != null)
-                query.Where(x => x.ChippingDateTime <= options.EndDateTime);
+                query = query.Where(x => x.ChippingDateTime <= options.EndDateTime);
             if(options.ChipperId != null)
-                query.Where(x => x.ChipperId == options.ChipperId);
+                query = query.Where(x => x.ChipperId == options.ChipperId);
             if(options.ChippingLocationId != null)
-                query.Where(x => x.ChippingLocationId == options.ChippingLocationId);
+                query = query.Where(x => x.ChippingLocationId == options.ChippingLocationId);
             if(options.LifeStatus != null)
-                query.Where(x => x.LifeStatus == options.LifeStatus);
+                query = query.Where(x => x.LifeStatus == options.LifeStatus);
             if(options.Gender != null)
-                query.Where(x => x.Gender == options.Gender);
+                query = query.Where(x => x.Gender == options.Gender);
 
             return await query.Skip(from).Take(size).ToListAsync();
         }

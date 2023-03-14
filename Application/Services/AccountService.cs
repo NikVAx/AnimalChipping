@@ -27,9 +27,11 @@ namespace Application.Services
         {
             var account = await _applicationDbContext.Account
                 .FirstOrDefaultAsync(x => x.Email == email);
+            
             if (account != null)
                 _applicationDbContext.Account
                     .Entry(account).State = EntityState.Detached;
+            
             return account;
 
         }
@@ -37,9 +39,11 @@ namespace Application.Services
         public async Task<Account?> GetByIdAsync(int id)
         {
             var account = await _applicationDbContext.Account.FindAsync(id);
+            
             if(account != null)
                 _applicationDbContext.Account
                     .Entry(account).State = EntityState.Detached;
+            
             return account;
         }
 
@@ -64,15 +68,21 @@ namespace Application.Services
         public async Task<IEnumerable<Account>> SearchAsync(AccountFilter filter, int from = 0, int size = 10)
         {
             var query = _applicationDbContext.Account.AsQueryable();
-
+            
             if(filter.FirstName != null)
-                query.Where(x => x.FirstName.Contains(filter.FirstName, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(x => x.FirstName.ToLower()
+                    .Contains(filter.FirstName.ToLower()));         
+            
             if(filter.LastName != null)
-                query.Where(x => x.LastName.Contains(filter.LastName, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(x => x.LastName.ToLower()
+                    .Contains(filter.LastName.ToLower()));          
+            
             if(filter.Email != null)
-                query.Where(x => x.Email.Contains(filter.Email, StringComparison.OrdinalIgnoreCase));
-
+                query = query.Where(x => x.Email.ToLower()
+                    .Contains(filter.Email.ToLower()));
+            
             return await query
+                .OrderBy(x => x.Id)
                 .Skip(from)
                 .Take(size)
                 .ToListAsync();
@@ -84,10 +94,10 @@ namespace Application.Services
             {
                 account.Password = _passwordHasher
                     .HashPassword(account, account.Password);
-
+                
                 _applicationDbContext.Account
                     .Update(account);
-
+                
                 return await _applicationDbContext
                     .SaveChangesAsync();
             }
@@ -103,10 +113,10 @@ namespace Application.Services
             {
                 account.Password = _passwordHasher
                     .HashPassword(account, account.Password);
-
+               
                 _applicationDbContext.Account
                     .Add(account);
-
+                
                 return await _applicationDbContext
                     .SaveChangesAsync();
             }

@@ -13,7 +13,7 @@ namespace Application.Abstractions.Interfaces
         public Task<IEnumerable<AnimalVisitedLocation>> SearchAsync(long animalId,
             LocationFilter filter, int from = 0, int size = 10);
 
-        public Task<int> AddAsync(long animalId, long pointId);
+        public Task<AnimalVisitedLocation> AddAsync(long animalId, long pointId);
         public Task<int> UpdateAsync(long animalId, AnimalVisitedLocation location);
         public Task<int> RemoveAsync(long animalId, long pointId);
 

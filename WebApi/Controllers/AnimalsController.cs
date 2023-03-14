@@ -56,7 +56,7 @@ namespace WebApi.Controllers
 
         [HttpGet("{animalId:long}")]
         public async Task<ActionResult<GetAnimalDto>> Get(
-    long animalId)
+            long animalId)
         {
             if(animalId <= 0)
                 return BadRequest();
@@ -77,6 +77,15 @@ namespace WebApi.Controllers
         public async Task<ActionResult<GetAnimalDto>> Create(
             CreateUpdateAnimalDto createAnimalDto)
         {
+            if(!createAnimalDto.AnimalTypes.Any() ||
+                createAnimalDto.AnimalTypes.Where(x => x <= 0).Count() > 0 ||
+                createAnimalDto.Weight <= 0 ||
+                createAnimalDto.Height <= 0 ||
+                createAnimalDto.Length <= 0 ||
+                createAnimalDto.ChipperId <= 0 ||
+                createAnimalDto.ChippingLocationId <= 0)
+                return BadRequest();
+
             var animal = _mapper
                 .Map<Animal>(createAnimalDto);
 
@@ -88,10 +97,5 @@ namespace WebApi.Controllers
 
             return Created($"animals/{animal.Id}", result);
         }
-        
-
-
-
-
     }
 }

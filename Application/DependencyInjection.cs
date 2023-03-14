@@ -11,10 +11,11 @@ namespace Data
         public static IServiceCollection AddApplicationLayer(
             this IServiceCollection services)
         {
-            services.AddScoped<IAnimalTypeService,       AnimalTypeService>();
-            services.AddScoped<ILocationPointService,    LocationPointService>();
-            services.AddScoped<IAnimalService,           AnimalService>();
-            services.AddScoped<IAccountService,          AccountService>();
+            services.AddScoped<IAnimalTypeService, AnimalTypeService>();
+            services.AddScoped<ILocationPointService, LocationPointService>();
+            services.AddScoped<IAnimalService, AnimalService>();
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IAnimalLocationPointService, AnimalLocationPointService>();
             services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
 
             return services;

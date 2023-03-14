@@ -22,17 +22,18 @@ namespace Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Animal>()
-                   .HasOne<Account>()
+                   .HasOne(x => x.Chipper)
                    .WithMany()
                    .HasForeignKey(x => x.ChipperId);
             
             builder.Entity<Animal>()
                    .HasMany(x => x.AnimalTypes)
-                   .WithMany();
+                   .WithMany(x => x.Animals);
 
             builder.Entity<Animal>()
                    .HasMany(x => x.VisitedLocations)
                    .WithMany();
+
 
             builder.Entity<Account>()
                    .HasIndex(x => x.Email)

@@ -1,9 +1,4 @@
 ﻿using Domain.Enums;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-
-// TODO: Set default FromQueryAttribute policy to convert Name from PascalCase to camelCase
 
 namespace WebApi.DTOs.Animal
 {

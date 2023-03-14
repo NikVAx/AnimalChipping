@@ -6,7 +6,9 @@ namespace Domain.Entities
     {
         public long Id { get; set; }
         public long ChippingLocationId { get; set; }
+        public LocationPoint ChippingLocation { get; set; }
         public int ChipperId { get; set; }
+        public Account Chipper { get; set; }
         public ICollection<AnimalType> AnimalTypes { get; set; }
         public ICollection<AnimalVisitedLocation> VisitedLocations { get; set; }
         public float Weight { get; set; }

@@ -77,24 +77,6 @@ namespace WebApi.Controllers
         {
             string id = User.FindFirstValue("Id");
 
-            //var idString = User.FindFirstValue("Id");
-            //int? id = string.IsNullOrEmpty(idString) ? null : Convert.ToInt32(idString);
-            //if(accountId != id)
-            //    return Forbid();
-            //
-            //var account = _mapper
-            //    .Map<Account>(updateAccountDto);
-            //
-            //account.Id = accountId;
-            //
-            //await _accountService
-            //    .UpdateAsync(account);
-            //
-            //var result = _mapper
-            //    .Map<GetAccountDto>(account);
-            //
-            //return Ok(result);
-
             var account = await _accountService
                 .GetByIdAsync(accountId);
 
@@ -123,9 +105,6 @@ namespace WebApi.Controllers
 
             var id = User.FindFirstValue("Id");
 
-            //if(id == null)
-            //    return Unauthorized();
-
             var account = await _accountService
                 .GetByIdAsync(accountId);
 
@@ -137,6 +116,5 @@ namespace WebApi.Controllers
 
             return Ok();
         }
-    
     }
 }
