@@ -2,9 +2,8 @@
 
 namespace WebApi.DTOs.Animal
 {
-    public class CreateUpdateAnimalDto
+    public class UpdateAnimalDto
     {
-        public IEnumerable<long> AnimalTypes { get; set; }
         public float Weight { get; set; }
         public float Length { get; set; }
         public float Height { get; set; }

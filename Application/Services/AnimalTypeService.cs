@@ -59,20 +59,21 @@ namespace Application.Services
 
         public async Task<int> DeleteAsync(long id)
         {
-            try
-            {
-                AnimalType entity = new() { Id = id };
+            var type = await _applicationDbContext.AnimalTypes
+                .Include(x => x.Animals)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-                _applicationDbContext.AnimalTypes
-                    .Remove(entity);
+            if(type == null)
+                throw new NotFoundException($"AnimalType with Id {id} not found");
 
-                return await _applicationDbContext
-                    .SaveChangesAsync();
-            }
-            catch(DbUpdateConcurrencyException ex)
-            {
-                throw new NotFoundException($"AnimalType with Id {id} not found", ex);
-            }
+            if(type.Animals.Count > 0)
+                throw new OperationException($"AnimalType with Id {id} have related Animals");
+
+            _applicationDbContext.AnimalTypes
+                .Remove(type);
+
+            return await _applicationDbContext
+                .SaveChangesAsync();
         }
     }
 }

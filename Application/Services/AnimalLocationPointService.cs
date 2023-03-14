@@ -4,14 +4,10 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Services
 {
+
     public class AnimalLocationPointService :
         IAnimalLocationPointService
     {
@@ -56,7 +52,7 @@ namespace Application.Services
                 throw new NotFoundException($"LocationPoint with Id {pointId} is not found");
 
             if(animal.LifeStatus == LifeStatus.DEAD)
-                throw new InvalidOperationException("The Animal is dead, moving is impossible");
+                throw new OperationException("The Animal is dead, moving is impossible");
 
             AnimalVisitedLocation location = new AnimalVisitedLocation()
             {
@@ -71,7 +67,7 @@ namespace Application.Services
             if(animal.VisitedLocations.Any() == false)
             {
                 if(pointId == animal.ChippingLocationId)
-                    throw new InvalidOperationException($"Animal is already at this LocationPoint");
+                    throw new OperationException($"Animal is already at this LocationPoint");
                 
                 else
                 {
@@ -86,7 +82,7 @@ namespace Application.Services
                     .Last();
 
                 if(last.Id == pointId)
-                    throw new InvalidOperationException($"Animal is already at this LocationPoint");
+                    throw new OperationException($"Animal is already at this LocationPoint");
 
                 else
                 {
@@ -94,35 +90,6 @@ namespace Application.Services
                         .Add(location);
                 }
             }
-
-
-
-
-            //var currentLocation = animal.VisitedLocations
-            //    .OrderBy(x => x.DateTimeOfVisitLocationPoint)
-            //    .LastOrDefault();
-            //
-            //if(currentLocation == null)
-            //    throw new Exception($"Animal doesnt have any location points");
-            //
-            //if (currentLocation.Id == pointId)
-            //    throw new InvalidOperationException("The Animal is already at this LocationPoint");  
-            //
-            //
-            
-            //
-            //
-            //if(animal.VisitedLocations.Any() == false)
-            //{
-            //    animal.VisitedLocations.Add(location);
-            //}
-            //else if(animal.VisitedLocations.OrderBy(x => x.DateTimeOfVisitLocationPoint).LastOrDefault())
-            //{
-            //    var lastLocation = 
-            //
-            //} 
-
-            
 
             await _applicationDbContext
                 .SaveChangesAsync();

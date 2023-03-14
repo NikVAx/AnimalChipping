@@ -1,7 +1,7 @@
 ﻿using Application.Abstractions.Interfaces;
 using Application.DTOs;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.DTOs.VisitedLocationPoint;
 
@@ -9,6 +9,7 @@ namespace WebApi.Controllers
 {
     [Route("animals/{animalId:long}")]
     [ApiController]
+    [Authorize]
     public class AnimalVisitedLocationsController :
         ControllerBase
     {
@@ -40,8 +41,12 @@ namespace WebApi.Controllers
             var filter = _mapper
                 .Map<LocationFilter>(filterDto);
 
-            var result = await _animalLocationPointService
+            var points = await _animalLocationPointService
                 .SearchAsync(animalId, filter, from, size);
+
+            var result = points.Select(animalVisitedLocation => _mapper
+                .Map<GetVisitedLocationPointDto>(animalVisitedLocation));
+
             // TODO: add mapping to result type
             return Ok(result);
         }

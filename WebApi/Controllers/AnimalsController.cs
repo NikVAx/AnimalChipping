@@ -75,7 +75,7 @@ namespace WebApi.Controllers
 
         [HttpPost]
         public async Task<ActionResult<GetAnimalDto>> Create(
-            CreateUpdateAnimalDto createAnimalDto)
+            CreateAnimalDto createAnimalDto)
         {
             if(!createAnimalDto.AnimalTypes.Any() ||
                 createAnimalDto.AnimalTypes.Where(x => x <= 0).Count() > 0 ||
@@ -92,10 +92,62 @@ namespace WebApi.Controllers
             await _animalService
                 .CreateAsync(animal);
 
+            var createdAnimal = await _animalService
+                .GetByIdAsync(animal.Id);
+
             var result = _mapper
-                .Map<GetAnimalDto>(animal);
+                .Map<GetAnimalDto>(createdAnimal);
 
             return Created($"animals/{animal.Id}", result);
         }
+
+        [HttpPut("{animalId:long}")]
+        public async Task<ActionResult<GetAnimalDto>> Update(
+            long animalId,
+            UpdateAnimalDto updateAnimalDto)
+        {
+
+            if( animalId <= 0 ||
+                updateAnimalDto.Weight <= 0 ||
+                updateAnimalDto.Height <= 0 ||
+                updateAnimalDto.Length <= 0 ||
+                updateAnimalDto.ChipperId <= 0 ||
+                updateAnimalDto.ChippingLocationId <= 0)
+                return BadRequest();
+
+            var animal = _mapper
+                .Map<Animal>(updateAnimalDto);
+            animal.Id = animalId;
+
+            await _animalService
+                .UpdateAsync(animal);
+
+            var updatedAnimal = await _animalService
+                .GetByIdAsync(animal.Id);
+
+            var result = _mapper
+                .Map<GetAnimalDto>(updatedAnimal);
+
+            return Ok(result);
+        }
+
+        [HttpDelete("{animalId:long}")]
+        public async Task<ActionResult> Delete(long animalId)
+        {
+            if (animalId <= 0)
+                return BadRequest();
+
+            await _animalService
+                .DeleteAsync(animalId);
+
+            return Ok();
+        }
+
+        [HttpPost("{animalId:long}/types/{typeId:long}")]
+        public async Task<ActionResult> AddAnimalType(long animalId, long typeId)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
