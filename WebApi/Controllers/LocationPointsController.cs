@@ -4,7 +4,6 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.DTOs.LocationPoint;
-using WebApi.Utilities;
 
 namespace WebApi.Controllers
 {
