@@ -80,9 +80,6 @@ namespace WebApi.Controllers
             long pointId,
             CreateUpdateLocationPointDto updatePointDto)
         {
-            //if(!AuthHelper.HasIdClaim(User))
-            //    return Unauthorized();
-
             if(ModelState.IsValid == false || pointId <= 0)
                 return BadRequest();
 

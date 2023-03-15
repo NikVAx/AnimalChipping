@@ -25,8 +25,11 @@ namespace Application.Services
         {
             try
             {
-                _applicationDbContext.LocationPoints.Add(entity);
-                return await _applicationDbContext.SaveChangesAsync();
+                _applicationDbContext.LocationPoints
+                    .Add(entity);
+
+                return await _applicationDbContext
+                    .SaveChangesAsync();
             }
             catch(DbUpdateException ex)
             {
@@ -58,6 +61,14 @@ namespace Application.Services
         {
             try
             {
+                var haveRelatedChippingLocations = await _applicationDbContext.Animals
+                    .AnyAsync(x => x.ChippingLocationId == id);
+                var haveRelatedVisitedLocations = await _applicationDbContext.AnimalVisitedLocations
+                    .AnyAsync(x => x.LocationPointId == id);
+
+                if(haveRelatedChippingLocations || haveRelatedVisitedLocations)
+                    throw new OperationException("Location point have related entities");
+
                 LocationPoint entity = new() { Id = id };
 
                 _applicationDbContext.LocationPoints
