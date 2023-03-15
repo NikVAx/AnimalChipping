@@ -1,7 +1,5 @@
 using Data;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
 using WebApi.AutoMapper;
 using WebApi.Filters;
 using WebApi.Handlers;
@@ -20,19 +18,17 @@ namespace WebApi
             builder.Services.AddApplicationLayer();
             builder.Services.AddAutoMapper(typeof(DtoMappingProfile));
             
-            builder.Services.AddControllers(options =>
-            {
+            builder.Services.AddControllers(options => {
                 options.Filters.Add<ExceptionFilterAttribute>();
             });
 
             builder.Services.AddCors();
-            builder.Services.AddEndpointsApiExplorer(); // https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
 
             builder.Services.AddAuthentication("BasicAuthentication")
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
-            builder.Services.AddSwaggerGen(options =>
-            {
+            builder.Services.AddSwaggerGen(options => {
                 options.DescribeAllParametersInCamelCase();
             });
 

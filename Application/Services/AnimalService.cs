@@ -110,20 +110,33 @@ namespace Application.Services
                 if(animal == null)
                     throw new NotFoundException($"Animal with Id '{entity.Id}' is not found");
 
-                _applicationDbContext.Animals
-                    .Entry(animal).State = EntityState.Detached;
+                //_applicationDbContext.Animals
+                //    .Entry(animal).State = EntityState.Detached;
 
                 if(animal.LifeStatus != entity.LifeStatus)
                 {
                     if(animal.LifeStatus == LifeStatus.DEAD && entity.LifeStatus == LifeStatus.ALIVE)
                         throw new OperationException("Unable to change Animal LifeStatus 'DEAD' to 'ALIVE'");
                     else
+                    {
                         animal.DeathDateTime = DateTimeOffset.UtcNow;
-
+                        animal.LifeStatus    = LifeStatus.DEAD;
+                    }     
                 }
 
+                animal.Weight = entity.Weight;
+                animal.Height = entity.Height;
+                animal.Length = entity.Length;
+                animal.ChipperId = entity.ChipperId;
+                animal.ChippingLocationId = entity.ChippingLocationId;
+                animal.Gender = entity.Gender;
+
+                //var firstVisitedLocation = entity.VisitedLocations.FirstOrDefault();
+     
+                // TODO: сделать явный маппинг между entity и animal
+
                 _applicationDbContext.Animals
-                    .Update(entity);
+                    .Update(animal);
 
                 return await _applicationDbContext
                     .SaveChangesAsync();

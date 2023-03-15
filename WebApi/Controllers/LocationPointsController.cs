@@ -79,6 +79,9 @@ namespace WebApi.Controllers
             long pointId,
             CreateUpdateLocationPointDto updatePointDto)
         {
+            if(User.Claims.Any(x => x.ValueType == AppClaims.Id))
+                return Unauthorized();
+
             if(ModelState.IsValid == false || pointId <= 0)
                 return BadRequest();
 

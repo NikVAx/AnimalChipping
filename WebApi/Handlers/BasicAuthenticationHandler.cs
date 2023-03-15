@@ -61,7 +61,7 @@ namespace WebApi.Handlers
                 {
                     var claims = new[]
                     {
-                        new Claim("Id", account.Id.ToString())
+                        new Claim(AppClaims.Id, account.Id.ToString())
                     };
 
                     var ticket = CreateTicket(claims);
@@ -85,7 +85,7 @@ namespace WebApi.Handlers
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Anonymous, "Anonymous")
+                new Claim(AppClaims.Anonymous, "Anonymous")
             };
 
             return AuthenticateResult.Success( CreateTicket(claims) );

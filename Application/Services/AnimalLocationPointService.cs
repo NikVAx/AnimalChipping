@@ -83,7 +83,13 @@ namespace Application.Services
             await _applicationDbContext
                 .SaveChangesAsync();
 
-            return location;
+            _applicationDbContext.AnimalVisitedLocations
+                .Entry(location).State = EntityState.Detached;
+
+            var result = _applicationDbContext.AnimalVisitedLocations
+                .First(x => x.Id == location.Id);
+
+            return result;
         }
 
         public async Task<int> RemoveAsync(long animalId, long visitedPointId)
