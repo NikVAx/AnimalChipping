@@ -73,13 +73,18 @@ namespace WebApi.Controllers
         [HttpPut("locations")]
         public async Task<ActionResult<GetVisitedLocationPointDto>> UpdateLocations(
             long animalId,
-            long pointId)
+            UpdateVisitedLocationPointDto updateDto)
         {
-            if(animalId <= 0 || pointId <= 0)
+            if(animalId <= 0 || updateDto.LocationPointId <= 0 || updateDto.VisitedLocationPointId <= 0)
                 return BadRequest();
 
-            throw new NotImplementedException();
-            return new GetVisitedLocationPointDto();
+            var location = await _animalLocationPointService
+                .UpdateAsync(animalId, updateDto.VisitedLocationPointId, updateDto.LocationPointId);
+
+            var result = _mapper
+                .Map<GetVisitedLocationPointDto>(location);
+
+            return Ok(result);
         }
 
         [HttpDelete("locations/{visitedPointId:long}")]

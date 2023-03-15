@@ -144,9 +144,68 @@ namespace Application.Services
         }
 
 
-        public Task<int> UpdateAsync(long animalId, AnimalVisitedLocation location)
+        public async Task<AnimalVisitedLocation> UpdateAsync(
+            long animalId,
+            long visitedLocationPointId,
+            long locationPointId)
         {
-            throw new NotImplementedException();
+            var visitedLocation = await _applicationDbContext.AnimalVisitedLocations
+                .FirstOrDefaultAsync(x => x.Id == visitedLocationPointId);
+
+            if(visitedLocation == null)
+                throw new NotFoundException("VisitedLocationPoint not found");
+
+            var locationPoint = await _applicationDbContext.LocationPoints
+                .FirstOrDefaultAsync(x => x.Id == locationPointId);
+
+            if(locationPoint == null)
+                throw new NotFoundException("LocationPoint not found");
+
+            if(visitedLocation.LocationPointId == locationPoint.Id)
+                throw new OperationException("Changing the point to itself");
+
+            var animal = await _applicationDbContext.Animals
+                .Include(x=> x.VisitedLocations)
+                .FirstOrDefaultAsync(x => x.Id == animalId);
+
+            if(animal == null)
+                throw new NotFoundException("Animal not found");
+
+            if(animal.HasVisitedLocations() == false || animal.VisitedLocations.Contains(visitedLocation) == false)
+                throw new NotFoundException("Animal doesn't have required VisitedLocationPoint");
+
+            var listOfVisited = animal.VisitedLocations
+                .OrderBy(x => x.DateTimeOfVisitLocationPoint)
+                .ToList();
+
+            int index = listOfVisited.IndexOf(visitedLocation); // existence verified earlier
+
+
+            if(index == 0 || listOfVisited.Count == 2)
+            {
+                if(locationPoint.Id == animal.ChippingLocationId ||
+                   locationPoint.Id == visitedLocation.LocationPointId)
+                {
+                    throw new OperationException("Invalid location points order");
+                }
+            }
+            else
+            {
+                if(listOfVisited.ElementAt(index - 1).LocationPointId == locationPointId)
+                    throw new OperationException("Invalid location points order");
+                if(listOfVisited.ElementAt(index + 1).LocationPointId == locationPointId)
+                    throw new OperationException("Invalid location points order");       
+            }
+
+            visitedLocation.LocationPointId = locationPoint.Id;
+
+            _applicationDbContext.AnimalVisitedLocations
+                .Update(visitedLocation);
+
+            await _applicationDbContext
+                .SaveChangesAsync();
+
+            return visitedLocation;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Application.Abstractions.Interfaces
             LocationFilter filter, int from = 0, int size = 10);
 
         public Task<AnimalVisitedLocation> AddAsync(long animalId, long pointId);
-        public Task<int> UpdateAsync(long animalId, AnimalVisitedLocation location);
+        public Task<AnimalVisitedLocation> UpdateAsync(long animalId, long visitedLocationPointId, long locationPointId);
         public Task<int> RemoveAsync(long animalId, long pointId);
 
     }
