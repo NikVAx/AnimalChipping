@@ -161,5 +161,42 @@ namespace WebApi.Controllers
             return Created($@"animals/{animalId}", result);
         }
 
+        [HttpDelete("{animalId:long}/types/{typeId:long}")]
+        public async Task<ActionResult<GetAnimalDto>> RemoveAnimalType(long animalId, long typeId)
+        {
+            if(animalId <= 0 || typeId <= 0)
+                return BadRequest();
+
+            await _animalService
+                .RemoveAnimalType(animalId, typeId);
+
+            var animal = await _animalService
+                .GetByIdAsync(animalId);
+
+            var result = _mapper
+                .Map<GetAnimalDto>(animal);
+
+            return Ok(result);
+        }
+
+        [HttpPut("{animalId:long}/types")]
+        public async Task<ActionResult<GetAnimalDto>> UpdateAnimalType(
+            long animalId,
+            EditAnimalTypeDto editDto)
+        {
+            if(editDto.OldTypeId <= 0 || editDto.NewTypeId <= 0 || animalId <= 0)
+                return BadRequest();
+
+            await _animalService
+                .UpdateAnimalType(animalId, editDto.OldTypeId, editDto.NewTypeId);
+
+            var animal = await _animalService
+                .GetByIdAsync(animalId);
+
+            var result = _mapper
+                .Map<GetAnimalDto>(animal);
+
+            return Ok(result);
+        }
     }
 }

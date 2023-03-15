@@ -183,7 +183,7 @@ namespace Application.Services
             if(type == null)
                 throw new NotFoundException("AnimalType not found");
             if(animal.AnimalTypes.Contains(type))
-                throw new ConflictException($"Animal with Id {animal.Id} already has Type with Id {type.Id}");
+                throw new ConflictException($"Animal with Id {animalId} already has Type with Id {animalTypeId}");
 
             animal.AnimalTypes
                 .Add(type);
@@ -195,21 +195,67 @@ namespace Application.Services
                 .SaveChangesAsync();
         }
 
-        public Task UpdateAnimalType(long animalId, long oldTypeId, long newTypeId)
+        public async Task UpdateAnimalType(long animalId, long oldTypeId, long newTypeId)
         {
+            var animal = await _applicationDbContext.Animals
+                .Include(x => x.AnimalTypes)
+                .FirstOrDefaultAsync(x => x.Id == animalId);
+
+            var newType = await _applicationDbContext.AnimalTypes
+                .FirstOrDefaultAsync(x => x.Id == newTypeId);
+
+            var oldType = await _applicationDbContext.AnimalTypes
+                .FirstOrDefaultAsync(x => x.Id == oldTypeId);
             
+            if(animal == null)
+                throw new NotFoundException("Animal not found");
+            if(oldType == null)
+                throw new NotFoundException("Old AnimalType not found");
+            if(newType == null)
+                throw new NotFoundException("New AnimalType not found");
+           
+            if(animal.AnimalTypes.Contains(oldType) == false)
+                throw new NotFoundException($"Animal with Id {animalId} has not Type with Id {oldTypeId}");
+            if(animal.AnimalTypes.Contains(newType))
+                throw new ConflictException($"Animal with Id {animalId} already has Type with Id {newTypeId}");
 
-            
+            animal.AnimalTypes
+                .Remove(oldType);
+            animal.AnimalTypes
+                .Add(newType);
+            _applicationDbContext.Animals
+                .Update(animal);
 
-            
-
-
-            throw new NotImplementedException();
+            await _applicationDbContext
+                .SaveChangesAsync();
         }
 
-        public Task RemoveAnimalType(long animalId, long animalType)
+        public async Task RemoveAnimalType(long animalId, long animalTypeId)
         {
-            throw new NotImplementedException();
+            var animal = await _applicationDbContext.Animals
+                .Include(x => x.AnimalTypes)
+                .FirstOrDefaultAsync(x => x.Id == animalId);
+
+            var type = await _applicationDbContext.AnimalTypes
+                .FirstOrDefaultAsync(x => x.Id == animalTypeId);
+
+            if(animal == null)
+                throw new NotFoundException("Animal not found");
+            if(type == null)
+                throw new NotFoundException("AnimalType not found");
+            if(animal.AnimalTypes.Contains(type) == false)
+                throw new NotFoundException($"Animal with Id {animalId} have not Type with Id {animalTypeId}");
+            if(animal.AnimalTypes.Count == 1)
+                throw new OperationException("Only AnimalType can't be removed");
+
+            animal.AnimalTypes
+                .Remove(type);
+
+            _applicationDbContext.Animals
+                .Update(animal);
+
+            await _applicationDbContext
+                .SaveChangesAsync();
         }
     }
 }
