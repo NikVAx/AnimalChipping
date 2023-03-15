@@ -57,6 +57,9 @@ namespace WebApi.Controllers
         public async Task<ActionResult<GetLocationPointDto>> Create(
             CreateUpdateLocationPointDto createPointDto)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
             if (ModelState.IsValid == false) 
                 return BadRequest();
 
@@ -80,6 +83,9 @@ namespace WebApi.Controllers
             long pointId,
             CreateUpdateLocationPointDto updatePointDto)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
             if(ModelState.IsValid == false || pointId <= 0)
                 return BadRequest();
 
@@ -103,6 +109,9 @@ namespace WebApi.Controllers
         public async Task<ActionResult> Delete(
             long pointId)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
             if(pointId <= 0)
                 return BadRequest();
 

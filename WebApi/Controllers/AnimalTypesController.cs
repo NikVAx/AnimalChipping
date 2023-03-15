@@ -56,6 +56,9 @@ namespace WebApi.Controllers
         public async Task<ActionResult<GetAnimalTypeDto>> Create(
             CreateUpdateAnimalTypeDto createTypeDto)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
             if(ModelState.IsValid == false)
                 return BadRequest();
 
@@ -75,10 +78,12 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<GetAnimalTypeDto>> Update(
-            long typeId,
+        public async Task<ActionResult<GetAnimalTypeDto>> Update(long typeId,
             CreateUpdateAnimalTypeDto updateTypeDto)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
             if(ModelState.IsValid == false || typeId <= 0)
                 return BadRequest();
 
@@ -99,9 +104,11 @@ namespace WebApi.Controllers
         [HttpDelete("{typeId:long}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Delete(
-            long typeId)
+        public async Task<ActionResult> Delete(long typeId)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
             if(typeId <= 0)
                 return BadRequest();
 

@@ -75,6 +75,9 @@ namespace WebApi.Controllers
             int accountId,
             RegisterUpdateAccountDto updateAccountDto)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
             string id = User.FindFirstValue("Id");
 
             var account = await _accountService
@@ -100,6 +103,9 @@ namespace WebApi.Controllers
         [HttpDelete("{accountId:int}")]
         public async Task<ActionResult> Delete(int accountId)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
             if(accountId <= 0)
                 return BadRequest();
 

@@ -77,6 +77,12 @@ namespace WebApi.Controllers
         public async Task<ActionResult<GetAnimalDto>> Create(
             CreateAnimalDto createAnimalDto)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
+            // TODO: Create custom, validation attibute MoreThan(int value), MoreThan(long value), MoreThan(float value)
+            // and make validation simpler
+
             if(!createAnimalDto.AnimalTypes.Any() ||
                 createAnimalDto.AnimalTypes.Where(x => x <= 0).Count() > 0 ||
                 createAnimalDto.Weight <= 0 ||
@@ -106,6 +112,8 @@ namespace WebApi.Controllers
             long animalId,
             UpdateAnimalDto updateAnimalDto)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
 
             if(animalId <= 0 ||
                 updateAnimalDto.Weight <= 0 ||
@@ -134,6 +142,9 @@ namespace WebApi.Controllers
         [HttpDelete("{animalId:long}")]
         public async Task<ActionResult> Delete(long animalId)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
             if(animalId <= 0)
                 return BadRequest();
 
@@ -184,6 +195,7 @@ namespace WebApi.Controllers
             long animalId,
             EditAnimalTypeDto editDto)
         {
+
             if(editDto.OldTypeId <= 0 || editDto.NewTypeId <= 0 || animalId <= 0)
                 return BadRequest();
 

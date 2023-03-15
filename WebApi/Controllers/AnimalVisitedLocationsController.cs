@@ -58,6 +58,9 @@ namespace WebApi.Controllers
             long animalId,
             long pointId)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
             if(animalId <= 0 || pointId <= 0)
                 return BadRequest();
 
@@ -75,6 +78,9 @@ namespace WebApi.Controllers
             long animalId,
             UpdateVisitedLocationPointDto updateDto)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
             if(animalId <= 0 || updateDto.LocationPointId <= 0 || updateDto.VisitedLocationPointId <= 0)
                 return BadRequest();
 
@@ -92,6 +98,9 @@ namespace WebApi.Controllers
             long animalId,
             long visitedPointId)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+                return Unauthorized();
+
             if(animalId <= 0 || visitedPointId <= 0)
                 return BadRequest();
 

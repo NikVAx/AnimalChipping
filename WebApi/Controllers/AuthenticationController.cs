@@ -32,6 +32,9 @@ namespace WebApi.Controllers
         public async Task<ActionResult<GetAccountDto>> Register(
             RegisterUpdateAccountDto registerDto)
         {
+            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous) == false)
+                return Forbid();
+
             if(ModelState.IsValid == false)
                 return BadRequest();
 
