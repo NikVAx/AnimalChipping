@@ -104,14 +104,12 @@ namespace Application.Services
         {
             try
             {
-                var animal = await _applicationDbContext
-                    .Animals.FindAsync(entity.Id);
+                var animal = await _applicationDbContext.Animals
+                    .Include(x => x.VisitedLocations)
+                    .FirstOrDefaultAsync(x => x.Id == entity.Id);
 
                 if(animal == null)
                     throw new NotFoundException($"Animal with Id '{entity.Id}' is not found");
-
-                //_applicationDbContext.Animals
-                //    .Entry(animal).State = EntityState.Detached;
 
                 if(animal.LifeStatus != entity.LifeStatus)
                 {
@@ -120,8 +118,8 @@ namespace Application.Services
                     else
                     {
                         animal.DeathDateTime = DateTimeOffset.UtcNow;
-                        animal.LifeStatus    = LifeStatus.DEAD;
-                    }     
+                        animal.LifeStatus = LifeStatus.DEAD;
+                    }
                 }
 
                 animal.Weight = entity.Weight;
@@ -131,9 +129,15 @@ namespace Application.Services
                 animal.ChippingLocationId = entity.ChippingLocationId;
                 animal.Gender = entity.Gender;
 
-                //var firstVisitedLocation = entity.VisitedLocations.FirstOrDefault();
-     
-                // TODO: сделать явный маппинг между entity и animal
+                if(animal.HasVisitedLocations())
+                {
+                    var firstVisitedLocation = animal.VisitedLocations
+                        .First();
+
+                    if (firstVisitedLocation.LocationPointId == animal.ChippingLocationId)
+                        throw new OperationException("ChippingLocationId and VisitedLocationPoint is equal");
+
+                }
 
                 _applicationDbContext.Animals
                     .Update(animal);
@@ -165,17 +169,45 @@ namespace Application.Services
             return types;
         }
 
-        public Task<int> AddAnimalType(long animalId, long animalType)
+        public async Task AddAnimalType(long animalId, long animalTypeId)
         {
+            var animal = await _applicationDbContext.Animals
+                .Include(x => x.AnimalTypes)
+                .FirstOrDefaultAsync(x => x.Id == animalId);
+
+            var type = await _applicationDbContext.AnimalTypes
+                .FirstOrDefaultAsync(x => x.Id == animalTypeId);
+
+            if(animal == null)
+                throw new NotFoundException("Animal not found");
+            if(type == null)
+                throw new NotFoundException("AnimalType not found");
+            if(animal.AnimalTypes.Contains(type))
+                throw new ConflictException($"Animal with Id {animal.Id} already has Type with Id {type.Id}");
+
+            animal.AnimalTypes
+                .Add(type);
+
+            _applicationDbContext.Animals
+                .Update(animal);
+
+            await _applicationDbContext
+                .SaveChangesAsync();
+        }
+
+        public Task UpdateAnimalType(long animalId, long oldTypeId, long newTypeId)
+        {
+            
+
+            
+
+            
+
+
             throw new NotImplementedException();
         }
 
-        public Task<int> UpdateAnimalType(long animalId, long oldTypeId, long newTypeId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> RemoveAnimalType(long animalId, long animalType)
+        public Task RemoveAnimalType(long animalId, long animalType)
         {
             throw new NotImplementedException();
         }

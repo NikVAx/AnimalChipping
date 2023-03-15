@@ -107,7 +107,7 @@ namespace WebApi.Controllers
             UpdateAnimalDto updateAnimalDto)
         {
 
-            if( animalId <= 0 ||
+            if(animalId <= 0 ||
                 updateAnimalDto.Weight <= 0 ||
                 updateAnimalDto.Height <= 0 ||
                 updateAnimalDto.Length <= 0 ||
@@ -134,7 +134,7 @@ namespace WebApi.Controllers
         [HttpDelete("{animalId:long}")]
         public async Task<ActionResult> Delete(long animalId)
         {
-            if (animalId <= 0)
+            if(animalId <= 0)
                 return BadRequest();
 
             await _animalService
@@ -144,9 +144,21 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("{animalId:long}/types/{typeId:long}")]
-        public async Task<ActionResult> AddAnimalType(long animalId, long typeId)
+        public async Task<ActionResult<GetAnimalDto>> AddAnimalType(long animalId, long typeId)
         {
-            throw new NotImplementedException();
+            if(animalId <= 0 || typeId <= 0)
+                return BadRequest();
+                
+            await _animalService
+                .AddAnimalType(animalId, typeId);
+
+            var animal = await _animalService
+                .GetByIdAsync(animalId);
+
+            var result = _mapper
+                .Map<GetAnimalDto>(animal);
+
+            return Created($@"animals/{animalId}", result);
         }
 
     }

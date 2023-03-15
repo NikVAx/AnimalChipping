@@ -4,6 +4,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.DTOs.LocationPoint;
+using WebApi.Utilities;
 
 namespace WebApi.Controllers
 {
@@ -79,8 +80,8 @@ namespace WebApi.Controllers
             long pointId,
             CreateUpdateLocationPointDto updatePointDto)
         {
-            if(User.Claims.Any(x => x.ValueType == AppClaims.Id))
-                return Unauthorized();
+            //if(!AuthHelper.HasIdClaim(User))
+            //    return Unauthorized();
 
             if(ModelState.IsValid == false || pointId <= 0)
                 return BadRequest();
