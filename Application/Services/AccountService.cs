@@ -51,6 +51,14 @@ namespace Application.Services
         {
             try
             {
+                var haveRelationsWithAnimals = _applicationDbContext.Animals
+                    .Any(x => x.ChipperId == id);
+
+                if(haveRelationsWithAnimals)
+                {
+                    throw new OperationException("Account is related with Animal");
+                }
+
                 var entity = new Account() { Id = id };
 
                 _applicationDbContext.Account
