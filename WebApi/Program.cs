@@ -1,8 +1,11 @@
 using Data;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using WebApi.AutoMapper;
 using WebApi.Filters;
 using WebApi.Handlers;
+using WebApi.Middleware;
+using WebApi.Requirements;
 
 namespace WebApi
 {
@@ -17,7 +20,8 @@ namespace WebApi
             builder.Services.AddDataLayer(configuration);
             builder.Services.AddApplicationLayer();
             builder.Services.AddAutoMapper(typeof(DtoMappingProfile));
-            
+
+
             builder.Services.AddControllers(options => {
                 options.Filters.Add<ExceptionFilterAttribute>();
                 options.Filters.Add<ValidateModelFilerAttribute>();
@@ -26,15 +30,26 @@ namespace WebApi
             builder.Services.AddCors();
             builder.Services.AddEndpointsApiExplorer();
 
-            builder.Services.AddAuthentication("BasicAuthentication")
-                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
-
             builder.Services.AddSwaggerGen(options => {
                 options.DescribeAllParametersInCamelCase();
             });
+ 
 
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthentication("BasicAuthentication")
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy(BuildInPolicies.Identified, policy =>
+                {
+                    policy.Requirements.Add(new IdentifiedRequirement());
+                });
+            });
+
+            builder.Services.AddTransient<IAuthorizationHandler, IdentifiedHandler>();
+
+            builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler,
+                AppAuthorizationMiddlewareResultHandler>();
 
             var app = builder.Build();
 

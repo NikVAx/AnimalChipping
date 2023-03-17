@@ -48,14 +48,15 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(policy: BuildInPolicies.Identified)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult<GetLocationPointDto>> Create(
             CreateUpdateLocationPointDto createPointDto)
         {
-            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
-                return Unauthorized();
+            //if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
+            //    return Unauthorized();
 
             var point = _mapper
                 .Map<LocationPoint>(createPointDto);

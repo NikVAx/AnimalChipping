@@ -1,4 +1,5 @@
 ﻿using Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 using WebApi.Attibutes.ValidationAttibutes;
 
 namespace WebApi.DTOs.Animal
