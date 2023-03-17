@@ -33,9 +33,6 @@ namespace WebApi.Controllers
         public async Task<ActionResult<GetAccountDto>> Get(   
             [MinInt32(1)] int accountId)
         {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var account = await _accountService
                 .GetByIdAsync(accountId);
 
@@ -54,9 +51,6 @@ namespace WebApi.Controllers
             [MinInt32(0)] int from = 0,
             [MinInt32(1)] int size = 10)
         {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var filter = _mapper
                 .Map<AccountFilter>(filterDto);
 
@@ -106,9 +100,6 @@ namespace WebApi.Controllers
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
-
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var id = User.FindFirstValue("Id");
 

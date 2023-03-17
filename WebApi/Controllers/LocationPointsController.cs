@@ -35,9 +35,6 @@ namespace WebApi.Controllers
         public async Task<ActionResult<GetLocationPointDto>> Get(
             [MinInt64(1)] long pointId)
         {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var point = await _locationPointService
                 .GetByIdAsync(pointId);
 
@@ -59,9 +56,6 @@ namespace WebApi.Controllers
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
-
-            if (!ModelState.IsValid) 
-                return BadRequest(ModelState);
 
             var point = _mapper
                 .Map<LocationPoint>(createPointDto);
@@ -86,9 +80,6 @@ namespace WebApi.Controllers
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var point = _mapper
                 .Map<LocationPoint>(updatePointDto);
             
@@ -111,9 +102,6 @@ namespace WebApi.Controllers
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
-
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             await _locationPointService
                 .DeleteAsync(pointId);

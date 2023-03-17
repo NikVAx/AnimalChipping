@@ -36,9 +36,6 @@ namespace WebApi.Controllers
             [MinInt32(0)] int from = 0,
             [MinInt32(1)] int size = 10)
         {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var filter = _mapper
                 .Map<LocationFilter>(filterDto);
 
@@ -62,9 +59,6 @@ namespace WebApi.Controllers
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var location = await _animalLocationPointService
                 .AddAsync(animalId, pointId);
 
@@ -82,9 +76,6 @@ namespace WebApi.Controllers
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var location = await _animalLocationPointService
                 .UpdateAsync(animalId, updateDto.VisitedLocationPointId, updateDto.LocationPointId);
 
@@ -101,9 +92,6 @@ namespace WebApi.Controllers
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
-
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             await _animalLocationPointService
                 .RemoveAsync(animalId, visitedPointId);

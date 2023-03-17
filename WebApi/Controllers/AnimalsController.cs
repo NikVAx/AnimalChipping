@@ -31,15 +31,12 @@ namespace WebApi.Controllers
 
 
         [HttpGet("search")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<GetAnimalDto>>> Search(
             [FromQuery] AnimalFilterDto filterDto,
             [MinInt32(0)] int from = 0,
             [MinInt32(1)] int size = 10)
         {
-
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var filter = _mapper
                 .Map<AnimalFilter>(filterDto);
 
@@ -57,9 +54,6 @@ namespace WebApi.Controllers
         public async Task<ActionResult<GetAnimalDto>> Get(
             [MinInt64(1)] long animalId)
         {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var animal = await _animalService
                 .GetByIdAsync(animalId);
 
@@ -79,8 +73,7 @@ namespace WebApi.Controllers
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(!ModelState.IsValid ||
-               !createAnimalDto.AnimalTypes.Any() ||
+            if(!createAnimalDto.AnimalTypes.Any() ||
                 createAnimalDto.AnimalTypes.Any(x => x <= 0))
                 return BadRequest(ModelState);
 
@@ -107,11 +100,9 @@ namespace WebApi.Controllers
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var animal = _mapper
                 .Map<Animal>(updateAnimalDto);
+
             animal.Id = animalId;
 
             await _animalService
@@ -133,9 +124,6 @@ namespace WebApi.Controllers
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             await _animalService
                 .DeleteAsync(animalId);
 
@@ -147,8 +135,6 @@ namespace WebApi.Controllers
             [MinInt64(1)] long animalId,
             [MinInt64(1)] long typeId)
         {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
                 
             await _animalService
                 .AddAnimalType(animalId, typeId);
@@ -167,9 +153,6 @@ namespace WebApi.Controllers
             [MinInt64(1)] long animalId,
             [MinInt64(1)] long typeId)
         {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             await _animalService
                 .RemoveAnimalType(animalId, typeId);
 
@@ -187,9 +170,6 @@ namespace WebApi.Controllers
             [MinInt64(1)] long animalId,
             EditAnimalTypeDto editDto)
         {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             await _animalService
                 .UpdateAnimalType(animalId, editDto.OldTypeId, editDto.NewTypeId);
 

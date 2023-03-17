@@ -35,9 +35,6 @@ namespace WebApi.Controllers
         public async Task<ActionResult<GetAnimalTypeDto>> Get(
             [MinInt64(1)] long typeId)
         {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var animalType = await _animalTypeService
                 .GetByIdAsync(typeId);
 
@@ -59,9 +56,6 @@ namespace WebApi.Controllers
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
-
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var animalType = _mapper
                 .Map<AnimalType>(createTypeDto);
@@ -86,9 +80,6 @@ namespace WebApi.Controllers
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var type = _mapper
                 .Map<AnimalType>(updateTypeDto);
 
@@ -111,9 +102,6 @@ namespace WebApi.Controllers
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
-
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             await _animalTypeService
                 .DeleteAsync(typeId);
