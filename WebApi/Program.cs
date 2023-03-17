@@ -20,7 +20,7 @@ namespace WebApi
             
             builder.Services.AddControllers(options => {
                 options.Filters.Add<ExceptionFilterAttribute>();
-                options.Filters.Add<ValidateModelAttribute>();
+                options.Filters.Add<ValidateModelFilerAttribute>();
             });
 
             builder.Services.AddCors();
