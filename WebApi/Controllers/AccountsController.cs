@@ -1,10 +1,10 @@
 ﻿using Application.Abstractions.Interfaces;
 using Application.DTOs;
 using AutoMapper;
-using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using WebApi.Attibutes.ValidationAttibutes;
 using WebApi.DTOs.Account;
 
 namespace WebApi.Controllers
@@ -13,8 +13,7 @@ namespace WebApi.Controllers
     [ApiController]
     [Produces("application/json")]
     [Authorize]
-    public class AccountsController :
-        ControllerBase
+    public class AccountsController : ControllerBase
     {
         private readonly ILogger<AccountsController> _logger;
         private readonly IAccountService _accountService;
@@ -31,10 +30,11 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("{accountId:int}")]
-        public async Task<ActionResult<GetAccountDto>> Get(int accountId)
+        public async Task<ActionResult<GetAccountDto>> Get(   
+            [MinInt32(1)] int accountId)
         {
-            if(accountId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var account = await _accountService
                 .GetByIdAsync(accountId);
@@ -51,11 +51,11 @@ namespace WebApi.Controllers
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<GetAccountDto>>> Search(
             [FromQuery] AccountFilterDto filterDto,
-            int from = 0,
-            int size = 10)
+            [MinInt32(0)] int from = 0,
+            [MinInt32(1)] int size = 10)
         {
-            if(ModelState.IsValid == false || from < 0 || size <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var filter = _mapper
                 .Map<AccountFilter>(filterDto);
@@ -72,7 +72,7 @@ namespace WebApi.Controllers
 
         [HttpPut("{accountId:int}")]
         public async Task<ActionResult<GetAccountDto>> Update(
-            int accountId,
+            [MinInt32(1)] int accountId,
             RegisterUpdateAccountDto updateAccountDto)
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
@@ -101,13 +101,14 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete("{accountId:int}")]
-        public async Task<ActionResult> Delete(int accountId)
+        public async Task<ActionResult> Delete(
+            [MinInt32(1)] int accountId)
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(accountId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var id = User.FindFirstValue("Id");
 

@@ -3,6 +3,7 @@ using Application.DTOs;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Attibutes.ValidationAttibutes;
 using WebApi.DTOs.VisitedLocationPoint;
 
 namespace WebApi.Controllers
@@ -30,13 +31,13 @@ namespace WebApi.Controllers
 
         [HttpGet("locations")]
         public async Task<ActionResult<IEnumerable<GetVisitedLocationPointDto>>> GetLocations(
-            long animalId,
+            [MinInt64(1)] long animalId,
             [FromQuery] LocationFilterDto filterDto,
-            int from = 0,
-            int size = 10)
+            [MinInt32(0)] int from = 0,
+            [MinInt32(1)] int size = 10)
         {
-            if(ModelState.IsValid == false || from < 0 || size <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var filter = _mapper
                 .Map<LocationFilter>(filterDto);
@@ -55,14 +56,14 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GetVisitedLocationPointDto>> AddLocation(
-            long animalId,
-            long pointId)
+            [MinInt64(1)] long animalId,
+            [MinInt64(1)] long pointId)
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(animalId <= 0 || pointId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var location = await _animalLocationPointService
                 .AddAsync(animalId, pointId);
@@ -75,14 +76,14 @@ namespace WebApi.Controllers
 
         [HttpPut("locations")]
         public async Task<ActionResult<GetVisitedLocationPointDto>> UpdateLocations(
-            long animalId,
+            [MinInt64(1)] long animalId,
             UpdateVisitedLocationPointDto updateDto)
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(animalId <= 0 || updateDto.LocationPointId <= 0 || updateDto.VisitedLocationPointId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var location = await _animalLocationPointService
                 .UpdateAsync(animalId, updateDto.VisitedLocationPointId, updateDto.LocationPointId);
@@ -95,14 +96,14 @@ namespace WebApi.Controllers
 
         [HttpDelete("locations/{visitedPointId:long}")]
         public async Task<ActionResult> DeleteLocation(
-            long animalId,
-            long visitedPointId)
+            [MinInt64(1)] long animalId,
+            [MinInt64(1)] long visitedPointId)
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(animalId <= 0 || visitedPointId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             await _animalLocationPointService
                 .RemoveAsync(animalId, visitedPointId);

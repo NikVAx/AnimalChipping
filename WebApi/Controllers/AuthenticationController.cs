@@ -35,8 +35,8 @@ namespace WebApi.Controllers
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous) == false)
                 return Forbid();
 
-            if(ModelState.IsValid == false)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var account = _mapper
                 .Map<Account>(registerDto);

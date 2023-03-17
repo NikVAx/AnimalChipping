@@ -3,6 +3,7 @@ using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Attibutes.ValidationAttibutes;
 using WebApi.DTOs.AnimalType;
 
 namespace WebApi.Controllers
@@ -32,10 +33,10 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GetAnimalTypeDto>> Get(
-            long typeId)
+            [MinInt64(1)] long typeId)
         {
-            if(typeId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var animalType = await _animalTypeService
                 .GetByIdAsync(typeId);
@@ -59,8 +60,8 @@ namespace WebApi.Controllers
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(ModelState.IsValid == false)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var animalType = _mapper
                 .Map<AnimalType>(createTypeDto);
@@ -78,14 +79,15 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<GetAnimalTypeDto>> Update(long typeId,
+        public async Task<ActionResult<GetAnimalTypeDto>> Update(
+            [MinInt64(1)] long typeId,
             CreateUpdateAnimalTypeDto updateTypeDto)
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(ModelState.IsValid == false || typeId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var type = _mapper
                 .Map<AnimalType>(updateTypeDto);
@@ -104,13 +106,14 @@ namespace WebApi.Controllers
         [HttpDelete("{typeId:long}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Delete(long typeId)
+        public async Task<ActionResult> Delete(
+            [MinInt64(1)] long typeId)
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(typeId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             await _animalTypeService
                 .DeleteAsync(typeId);

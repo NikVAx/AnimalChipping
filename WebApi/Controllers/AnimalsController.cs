@@ -4,8 +4,8 @@ using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Attibutes.ValidationAttibutes;
 using WebApi.DTOs.Animal;
-using WebApi.DTOs.VisitedLocationPoint;
 
 namespace WebApi.Controllers
 {
@@ -13,8 +13,7 @@ namespace WebApi.Controllers
     [ApiController]
     [Produces("application/json")]
     [Authorize]
-    public class AnimalsController :
-        ControllerBase
+    public class AnimalsController : ControllerBase
     {
         private readonly ILogger<AnimalsController> _logger;
         private readonly IAnimalService _animalService;
@@ -34,12 +33,12 @@ namespace WebApi.Controllers
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<GetAnimalDto>>> Search(
             [FromQuery] AnimalFilterDto filterDto,
-            int from = 0,
-            int size = 10)
+            [MinInt32(0)] int from = 0,
+            [MinInt32(1)] int size = 10)
         {
 
-            if(ModelState.IsValid == false || from < 0 || size <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var filter = _mapper
                 .Map<AnimalFilter>(filterDto);
@@ -56,10 +55,10 @@ namespace WebApi.Controllers
 
         [HttpGet("{animalId:long}")]
         public async Task<ActionResult<GetAnimalDto>> Get(
-            long animalId)
+            [MinInt64(1)] long animalId)
         {
-            if(animalId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var animal = await _animalService
                 .GetByIdAsync(animalId);
@@ -80,17 +79,10 @@ namespace WebApi.Controllers
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            // TODO: Create custom, validation attibute MoreThan(int value), MoreThan(long value), MoreThan(float value)
-            // and make validation simpler
-
-            if(!createAnimalDto.AnimalTypes.Any() ||
-                createAnimalDto.AnimalTypes.Where(x => x <= 0).Count() > 0 ||
-                createAnimalDto.Weight <= 0 ||
-                createAnimalDto.Height <= 0 ||
-                createAnimalDto.Length <= 0 ||
-                createAnimalDto.ChipperId <= 0 ||
-                createAnimalDto.ChippingLocationId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid ||
+               !createAnimalDto.AnimalTypes.Any() ||
+                createAnimalDto.AnimalTypes.Any(x => x <= 0))
+                return BadRequest(ModelState);
 
             var animal = _mapper
                 .Map<Animal>(createAnimalDto);
@@ -109,19 +101,14 @@ namespace WebApi.Controllers
 
         [HttpPut("{animalId:long}")]
         public async Task<ActionResult<GetAnimalDto>> Update(
-            long animalId,
+            [MinInt64(1)] long animalId,
             UpdateAnimalDto updateAnimalDto)
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(animalId <= 0 ||
-                updateAnimalDto.Weight <= 0 ||
-                updateAnimalDto.Height <= 0 ||
-                updateAnimalDto.Length <= 0 ||
-                updateAnimalDto.ChipperId <= 0 ||
-                updateAnimalDto.ChippingLocationId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var animal = _mapper
                 .Map<Animal>(updateAnimalDto);
@@ -140,13 +127,14 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete("{animalId:long}")]
-        public async Task<ActionResult> Delete(long animalId)
+        public async Task<ActionResult> Delete(
+            [MinInt64(1)] long animalId)
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(animalId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             await _animalService
                 .DeleteAsync(animalId);
@@ -155,10 +143,12 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("{animalId:long}/types/{typeId:long}")]
-        public async Task<ActionResult<GetAnimalDto>> AddAnimalType(long animalId, long typeId)
+        public async Task<ActionResult<GetAnimalDto>> AddAnimalType(
+            [MinInt64(1)] long animalId,
+            [MinInt64(1)] long typeId)
         {
-            if(animalId <= 0 || typeId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
                 
             await _animalService
                 .AddAnimalType(animalId, typeId);
@@ -173,10 +163,12 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete("{animalId:long}/types/{typeId:long}")]
-        public async Task<ActionResult<GetAnimalDto>> RemoveAnimalType(long animalId, long typeId)
+        public async Task<ActionResult<GetAnimalDto>> RemoveAnimalType(
+            [MinInt64(1)] long animalId,
+            [MinInt64(1)] long typeId)
         {
-            if(animalId <= 0 || typeId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             await _animalService
                 .RemoveAnimalType(animalId, typeId);
@@ -192,12 +184,11 @@ namespace WebApi.Controllers
 
         [HttpPut("{animalId:long}/types")]
         public async Task<ActionResult<GetAnimalDto>> UpdateAnimalType(
-            long animalId,
+            [MinInt64(1)] long animalId,
             EditAnimalTypeDto editDto)
         {
-
-            if(editDto.OldTypeId <= 0 || editDto.NewTypeId <= 0 || animalId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             await _animalService
                 .UpdateAnimalType(animalId, editDto.OldTypeId, editDto.NewTypeId);

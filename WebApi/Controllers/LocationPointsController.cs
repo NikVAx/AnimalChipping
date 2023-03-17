@@ -3,6 +3,7 @@ using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Attibutes.ValidationAttibutes;
 using WebApi.DTOs.LocationPoint;
 
 namespace WebApi.Controllers
@@ -32,10 +33,10 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GetLocationPointDto>> Get(
-            long pointId)
+            [MinInt64(1)] long pointId)
         {
-            if(pointId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var point = await _locationPointService
                 .GetByIdAsync(pointId);
@@ -59,8 +60,8 @@ namespace WebApi.Controllers
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if (ModelState.IsValid == false) 
-                return BadRequest();
+            if (!ModelState.IsValid) 
+                return BadRequest(ModelState);
 
             var point = _mapper
                 .Map<LocationPoint>(createPointDto);
@@ -79,14 +80,14 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult<GetLocationPointDto>> Update(
-            long pointId,
+            [MinInt64(1)] long pointId,
             CreateUpdateLocationPointDto updatePointDto)
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(ModelState.IsValid == false || pointId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var point = _mapper
                 .Map<LocationPoint>(updatePointDto);
@@ -106,13 +107,13 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> Delete(
-            long pointId)
+            [MinInt64(1)] long pointId)
         {
             if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
                 return Unauthorized();
 
-            if(pointId <= 0)
-                return BadRequest();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             await _locationPointService
                 .DeleteAsync(pointId);
