@@ -21,14 +21,14 @@ namespace Application.Services
                 .FindAsync(id);
         }
 
-        public async Task<int> CreateAsync(AnimalType entity)
+        public async Task CreateAsync(AnimalType entity)
         {
             try
             {
                 _applicationDbContext.AnimalTypes
                     .Add(entity);
 
-                return await _applicationDbContext
+                await _applicationDbContext
                     .SaveChangesAsync();
             }
             catch (DbUpdateException ex)
@@ -37,14 +37,14 @@ namespace Application.Services
             }
         }
 
-        public async Task<int> UpdateAsync(AnimalType entity)
+        public async Task UpdateAsync(AnimalType entity)
         {
             try
             {
                 _applicationDbContext.AnimalTypes
                     .Update(entity);
 
-                return await _applicationDbContext
+                await _applicationDbContext
                     .SaveChangesAsync();
             }
             catch(DbUpdateConcurrencyException ex)
@@ -57,7 +57,7 @@ namespace Application.Services
             }
         }
 
-        public async Task<int> DeleteAsync(long id)
+        public async Task DeleteAsync(long id)
         {
             var type = await _applicationDbContext.AnimalTypes
                 .Include(x => x.Animals)
@@ -72,7 +72,7 @@ namespace Application.Services
             _applicationDbContext.AnimalTypes
                 .Remove(type);
 
-            return await _applicationDbContext
+            await _applicationDbContext
                 .SaveChangesAsync();
         }
     }

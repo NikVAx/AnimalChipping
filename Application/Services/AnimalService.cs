@@ -3,7 +3,6 @@ using Application.DTOs;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Exceptions;
-using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
@@ -18,7 +17,7 @@ namespace Application.Services
             _applicationDbContext = applicationDbContext;
         }
 
-        public async Task<int> CreateAsync(Animal entity)
+        public async Task CreateAsync(Animal entity)
         {
             try
             {
@@ -30,13 +29,11 @@ namespace Application.Services
                 _applicationDbContext.Animals
                     .Add(entity);
 
-                int count = await _applicationDbContext
+                await _applicationDbContext
                     .SaveChangesAsync();
 
                 _applicationDbContext.Animals
                     .Entry(entity).State = EntityState.Detached;
-
-                return count;
             }
             catch (DbUpdateException ex)
             {
@@ -55,7 +52,7 @@ namespace Application.Services
             return animal;
         }
 
-        public async Task<int> DeleteAsync(long id)
+        public async Task DeleteAsync(long id)
         {
             var entity = await GetByIdAsync(id);
 
@@ -68,7 +65,7 @@ namespace Application.Services
             _applicationDbContext.Animals
                 .Remove(entity);
             
-            return await _applicationDbContext
+            await _applicationDbContext
                 .SaveChangesAsync();
         }
 
@@ -100,7 +97,7 @@ namespace Application.Services
                 .ToListAsync();
         }
 
-        public async Task<int> UpdateAsync(Animal entity)
+        public async Task UpdateAsync(Animal entity)
         {
             try
             {
@@ -115,11 +112,9 @@ namespace Application.Services
                 {
                     if(animal.LifeStatus == LifeStatus.DEAD && entity.LifeStatus == LifeStatus.ALIVE)
                         throw new OperationException("Unable to change Animal LifeStatus 'DEAD' to 'ALIVE'");
-                    else
-                    {
-                        animal.DeathDateTime = DateTimeOffset.UtcNow;
-                        animal.LifeStatus = LifeStatus.DEAD;
-                    }
+                    
+                    animal.DeathDateTime = DateTimeOffset.UtcNow;
+                    animal.LifeStatus = LifeStatus.DEAD;
                 }
 
                 animal.Weight = entity.Weight;
@@ -136,13 +131,12 @@ namespace Application.Services
 
                     if (firstVisitedLocation.LocationPointId == animal.ChippingLocationId)
                         throw new OperationException("ChippingLocationId and VisitedLocationPoint is equal");
-
                 }
 
                 _applicationDbContext.Animals
                     .Update(animal);
 
-                return await _applicationDbContext
+                await _applicationDbContext
                     .SaveChangesAsync();
             }
             catch (DbUpdateException ex)

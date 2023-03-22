@@ -3,8 +3,8 @@
     public interface ICrudService<TEntity, TID>
     {
         public Task<TEntity?> GetByIdAsync(TID id);
-        public Task<int> CreateAsync(TEntity entity);
-        public Task<int> UpdateAsync(TEntity entity);
-        public Task<int> DeleteAsync(TID id);
+        public Task CreateAsync(TEntity entity);
+        public Task UpdateAsync(TEntity entity);
+        public Task DeleteAsync(TID id);
     }
 }

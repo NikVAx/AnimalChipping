@@ -4,7 +4,6 @@ using Domain.Entities;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Principal;
 
 namespace Application.Services
 {
@@ -33,7 +32,6 @@ namespace Application.Services
                     .Entry(account).State = EntityState.Detached;
             
             return account;
-
         }
 
         public async Task<Account?> GetByIdAsync(int id)

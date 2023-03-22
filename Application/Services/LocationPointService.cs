@@ -21,14 +21,14 @@ namespace Application.Services
                 .FindAsync(id);
         }
 
-        public async Task<int> CreateAsync(LocationPoint entity)
+        public async Task CreateAsync(LocationPoint entity)
         {
             try
             {
                 _applicationDbContext.LocationPoints
                     .Add(entity);
 
-                return await _applicationDbContext
+                await _applicationDbContext
                     .SaveChangesAsync();
             }
             catch(DbUpdateException ex)
@@ -37,14 +37,14 @@ namespace Application.Services
             }
         }
 
-        public async Task<int> UpdateAsync(LocationPoint entity)
+        public async Task UpdateAsync(LocationPoint entity)
         {
             try
             {
                 _applicationDbContext.LocationPoints
                     .Update(entity);
 
-                return await _applicationDbContext
+                await _applicationDbContext
                     .SaveChangesAsync();
             }
             catch(DbUpdateConcurrencyException ex)
@@ -57,7 +57,7 @@ namespace Application.Services
             }  
         }
 
-        public async Task<int> DeleteAsync(long id)
+        public async Task DeleteAsync(long id)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace Application.Services
                 _applicationDbContext.LocationPoints
                     .Remove(entity);
 
-                return await _applicationDbContext
+                await _applicationDbContext
                     .SaveChangesAsync();
             }
             catch(DbUpdateConcurrencyException ex)
