@@ -47,7 +47,7 @@ namespace Application.Services
             return account;
         }
 
-        public async Task<int> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace Application.Services
                 _applicationDbContext.Account
                     .Remove(entity);
 
-                return await _applicationDbContext
+                await _applicationDbContext
                     .SaveChangesAsync();
             }
             catch(DbUpdateConcurrencyException ex)
@@ -96,7 +96,7 @@ namespace Application.Services
                 .ToListAsync();
         }
 
-        public async Task<int> UpdateAsync(Account account)
+        public async Task UpdateAsync(Account account)
         {
             try
             {
@@ -106,7 +106,7 @@ namespace Application.Services
                 _applicationDbContext.Account
                     .Update(account);
                 
-                return await _applicationDbContext
+                await _applicationDbContext
                     .SaveChangesAsync();
             }
             catch(DbUpdateConcurrencyException ex)
@@ -115,7 +115,7 @@ namespace Application.Services
             }
         }
 
-        public async Task<int> RegisterAsync(Account account)
+        public async Task RegisterAsync(Account account)
         {
             try
             {
@@ -125,7 +125,7 @@ namespace Application.Services
                 _applicationDbContext.Account
                     .Add(account);
                 
-                return await _applicationDbContext
+                await _applicationDbContext
                     .SaveChangesAsync();
             }
             catch(DbUpdateException ex)

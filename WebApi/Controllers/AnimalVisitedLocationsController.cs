@@ -49,6 +49,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("locations/{pointId:long}")]
+        [Authorize(policy: BuildInPolicies.Identified)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -56,9 +57,6 @@ namespace WebApi.Controllers
             [MinInt64(1)] long animalId,
             [MinInt64(1)] long pointId)
         {
-            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
-                return Unauthorized();
-
             var location = await _animalLocationPointService
                 .AddAsync(animalId, pointId);
 
@@ -68,14 +66,12 @@ namespace WebApi.Controllers
             return Created("animals/{animalId}/locations", result);
         }
 
+        [Authorize(policy: BuildInPolicies.Identified)]
         [HttpPut("locations")]
         public async Task<ActionResult<GetVisitedLocationPointDto>> UpdateLocations(
             [MinInt64(1)] long animalId,
             UpdateVisitedLocationPointDto updateDto)
         {
-            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
-                return Unauthorized();
-
             var location = await _animalLocationPointService
                 .UpdateAsync(animalId, updateDto.VisitedLocationPointId, updateDto.LocationPointId);
 
@@ -85,13 +81,12 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
+        //[Authorize(policy: BuildInPolicies.Identified)]
         [HttpDelete("locations/{visitedPointId:long}")]
         public async Task<ActionResult> DeleteLocation(
             [MinInt64(1)] long animalId,
             [MinInt64(1)] long visitedPointId)
         {
-            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
-                return Unauthorized();
 
             await _animalLocationPointService
                 .RemoveAsync(animalId, visitedPointId);

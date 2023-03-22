@@ -55,9 +55,6 @@ namespace WebApi.Controllers
         public async Task<ActionResult<GetLocationPointDto>> Create(
             CreateUpdateLocationPointDto createPointDto)
         {
-            //if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
-            //    return Unauthorized();
-
             var point = _mapper
                 .Map<LocationPoint>(createPointDto);
 
@@ -71,6 +68,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut("{pointId:long}")]
+        [Authorize(policy: BuildInPolicies.Identified)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -78,9 +76,6 @@ namespace WebApi.Controllers
             [MinInt64(1)] long pointId,
             CreateUpdateLocationPointDto updatePointDto)
         {
-            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
-                return Unauthorized();
-
             var point = _mapper
                 .Map<LocationPoint>(updatePointDto);
             
@@ -96,14 +91,12 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete("{pointId:long}")]
+        [Authorize(policy: BuildInPolicies.Identified)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> Delete(
             [MinInt64(1)] long pointId)
         {
-            if(User.HasClaim(AppClaims.Anonymous, AppClaims.Anonymous))
-                return Unauthorized();
-
             await _locationPointService
                 .DeleteAsync(pointId);
 
