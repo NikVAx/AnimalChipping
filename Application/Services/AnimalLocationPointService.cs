@@ -92,7 +92,7 @@ namespace Application.Services
             return result;
         }
 
-        public async Task<int> RemoveAsync(long animalId, long visitedPointId)
+        public async Task RemoveAsync(long animalId, long visitedPointId)
         {
             var animal = await _applicationDbContext.Animals
                 .Include(x => x.VisitedLocations)
@@ -134,13 +134,12 @@ namespace Application.Services
                 // 1 [0] - 2 [1] - 3 [2] - 2 [3] => remove 3 [2] =>  1 [0] - 2 [1] - 2 [2]
 
                 var location = animal.VisitedLocations
-                    .Where(x => x.Id == visitedPointId)
-                    .First();
+                    .First(x => x.Id == visitedPointId);
 
                 animal.VisitedLocations.Remove(location);
             }
 
-            return await _applicationDbContext.SaveChangesAsync();
+            await _applicationDbContext.SaveChangesAsync();
         }
 
 

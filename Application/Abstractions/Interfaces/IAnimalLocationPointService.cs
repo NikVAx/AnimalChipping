@@ -15,7 +15,7 @@ namespace Application.Abstractions.Interfaces
 
         public Task<AnimalVisitedLocation> AddAsync(long animalId, long pointId);
         public Task<AnimalVisitedLocation> UpdateAsync(long animalId, long visitedLocationPointId, long locationPointId);
-        public Task<int> RemoveAsync(long animalId, long pointId);
+        public Task RemoveAsync(long animalId, long pointId);
 
     }
 }

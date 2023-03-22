@@ -7,12 +7,10 @@ namespace Data
     {
         public static void RecreateDatabase(IServiceProvider serviceProvider)
         {
-            using(var context = new ApplicationDbContext(serviceProvider
-                .GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
-            {
-                context.Database.EnsureDeleted();
-                context.Database.EnsureCreated();
-            }
+            using var context = new ApplicationDbContext(serviceProvider
+                .GetRequiredService<DbContextOptions<ApplicationDbContext>>());
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
         }
     }
 }
