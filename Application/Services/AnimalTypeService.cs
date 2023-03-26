@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Interfaces;
 using Domain.Entities;
 using Domain.Exceptions;
+using Domain.Exceptions.BaseLogicExceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services

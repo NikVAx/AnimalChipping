@@ -1,4 +1,5 @@
 ﻿using Domain.Exceptions;
+using Domain.Exceptions.BaseLogicExceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 

@@ -25,22 +25,17 @@ namespace Application.Services
         public async Task<Account?> GetByEmailAsync(string email)
         {
             var account = await _applicationDbContext.Account
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Email == email);
-            
-            if (account != null)
-                _applicationDbContext.Account
-                    .Entry(account).State = EntityState.Detached;
             
             return account;
         }
 
         public async Task<Account?> GetByIdAsync(int id)
         {
-            var account = await _applicationDbContext.Account.FindAsync(id);
-            
-            if(account != null)
-                _applicationDbContext.Account
-                    .Entry(account).State = EntityState.Detached;
+            var account = await _applicationDbContext.Account
+                .AsNoTracking()
+                .FirstAsync(id);
             
             return account;
         }

@@ -3,6 +3,7 @@ using Application.DTOs;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Exceptions;
+using Domain.Exceptions.BaseLogicExceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
