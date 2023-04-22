@@ -8,8 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
-    public class AnimalService :
-        IAnimalService
+    public class AnimalService :  IAnimalService
     {
         private readonly IApplicationDbContext _applicationDbContext;
 
@@ -23,7 +22,7 @@ namespace Application.Services
             try
             {
                 var types = await LoadTypes(entity);
-
+                
                 entity.AnimalTypes = types.ToArray();
                 entity.ChippingDateTime = DateTimeOffset.UtcNow;
 
@@ -58,10 +57,10 @@ namespace Application.Services
             var entity = await GetByIdAsync(id);
 
             if(entity == null)
-                throw new NotFoundException($"Animal with Id '{id}' is not found");
+                throw new NotFoundException(typeof(Animal), id);
 
             if(entity.VisitedLocations.Count > 0)
-                throw new OperationException($"Animal already leave ChippingLocationPoint");
+                throw new InvalidDomainOperationException($"Animal already leave ChippingLocationPoint");
 
             _applicationDbContext.Animals
                 .Remove(entity);
@@ -107,12 +106,12 @@ namespace Application.Services
                     .FirstOrDefaultAsync(x => x.Id == entity.Id);
 
                 if(animal == null)
-                    throw new NotFoundException($"Animal with Id '{entity.Id}' is not found");
+                    throw new NotFoundException(typeof(Animal), entity.Id);
 
                 if(animal.LifeStatus != entity.LifeStatus)
                 {
                     if(animal.LifeStatus == LifeStatus.DEAD && entity.LifeStatus == LifeStatus.ALIVE)
-                        throw new OperationException("Unable to change Animal LifeStatus 'DEAD' to 'ALIVE'");
+                        throw new InvalidDomainOperationException("Unable to change Animal LifeStatus 'DEAD' to 'ALIVE'");
                     
                     animal.DeathDateTime = DateTimeOffset.UtcNow;
                     animal.LifeStatus = LifeStatus.DEAD;
@@ -131,7 +130,7 @@ namespace Application.Services
                         .First();
 
                     if (firstVisitedLocation.LocationPointId == animal.ChippingLocationId)
-                        throw new OperationException("ChippingLocationId and VisitedLocationPoint is equal");
+                        throw new InvalidDomainOperationException("ChippingLocationId and VisitedLocationPoint is equal");
                 }
 
                 _applicationDbContext.Animals
@@ -156,7 +155,7 @@ namespace Application.Services
                     .FindAsync(type.Id);
 
                 if(found == null)
-                    throw new NotFoundException($"AnimalType with Id {type.Id} is not found");
+                    throw new NotFoundException(typeof(AnimalType), type.Id);
 
                 types.Add(found);
             }
@@ -173,10 +172,12 @@ namespace Application.Services
             var type = await _applicationDbContext.AnimalTypes
                 .FirstOrDefaultAsync(x => x.Id == animalTypeId);
 
-            if(animal == null)
-                throw new NotFoundException("Animal not found");
+            if (animal == null)
+                throw new NotFoundException(typeof(Animal), animalId);
+
             if(type == null)
-                throw new NotFoundException("AnimalType not found");
+                throw new NotFoundException(typeof(AnimalType), animalTypeId);
+
             if(animal.AnimalTypes.Contains(type))
                 throw new ConflictException($"Animal with Id {animalId} already has Type with Id {animalTypeId}");
 
@@ -201,16 +202,20 @@ namespace Application.Services
 
             var oldType = await _applicationDbContext.AnimalTypes
                 .FirstOrDefaultAsync(x => x.Id == oldTypeId);
+
+            if (animal == null)
+                throw new NotFoundException(typeof(Animal), animalId);
             
-            if(animal == null)
-                throw new NotFoundException("Animal not found");
             if(oldType == null)
-                throw new NotFoundException("Old AnimalType not found");
-            if(newType == null)
-                throw new NotFoundException("New AnimalType not found");
-           
-            if(animal.AnimalTypes.Contains(oldType) == false)
-                throw new NotFoundException($"Animal with Id {animalId} has not Type with Id {oldTypeId}");
+                throw new NotFoundException(typeof(AnimalType), oldTypeId);
+
+            if (newType == null)
+                throw new NotFoundException(typeof(AnimalType), newTypeId);
+
+            if (animal.AnimalTypes.Contains(oldType) == false)
+                throw new NotFoundException(typeof(AnimalType), oldTypeId,
+                    typeof(Animal), animalId);
+            
             if(animal.AnimalTypes.Contains(newType))
                 throw new ConflictException($"Animal with Id {animalId} already has Type with Id {newTypeId}");
 
@@ -235,13 +240,17 @@ namespace Application.Services
                 .FirstOrDefaultAsync(x => x.Id == animalTypeId);
 
             if(animal == null)
-                throw new NotFoundException("Animal not found");
+                throw new NotFoundException(typeof(Animal), animalId);
+            
             if(type == null)
-                throw new NotFoundException("AnimalType not found");
-            if(animal.AnimalTypes.Contains(type) == false)
-                throw new NotFoundException($"Animal with Id {animalId} have not Type with Id {animalTypeId}");
+                throw new NotFoundException(typeof(AnimalType), animalTypeId);
+
+            if (animal.AnimalTypes.Contains(type) == false)
+                throw new NotFoundException(typeof(AnimalType), type.Id, typeof(Animal),
+                    animal.Id);
+
             if(animal.AnimalTypes.Count == 1)
-                throw new OperationException("Only AnimalType can't be removed");
+                throw new InvalidDomainOperationException("Only AnimalType can't be removed");
 
             animal.AnimalTypes
                 .Remove(type);

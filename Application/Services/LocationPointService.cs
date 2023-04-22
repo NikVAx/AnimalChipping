@@ -50,7 +50,7 @@ namespace Application.Services
             }
             catch(DbUpdateConcurrencyException ex)
             {
-                throw new NotFoundException($"LocationPoint with Id {entity.Id} not found", ex);
+                throw new NotFoundException(typeof(LocationPoint), entity.Id, ex);
             }
             catch(DbUpdateException ex)
             {
@@ -68,7 +68,7 @@ namespace Application.Services
                     .AnyAsync(x => x.LocationPointId == id);
 
                 if(haveRelatedChippingLocations || haveRelatedVisitedLocations)
-                    throw new OperationException("Location point have related entities");
+                    throw new InvalidDomainOperationException("Location point have related entities");
 
                 LocationPoint entity = new() { Id = id };
 
@@ -80,7 +80,7 @@ namespace Application.Services
             }
             catch(DbUpdateConcurrencyException ex)
             {
-                throw new NotFoundException($"LocationPoint with Id {id} not found", ex);
+                throw new NotFoundException(typeof(LocationPoint), id, ex);
             }
         }
     }

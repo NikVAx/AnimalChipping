@@ -1,6 +1,7 @@
 using Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using WebApi.AutoMapper;
 using WebApi.Filters;
 using WebApi.Handlers;
@@ -28,6 +29,7 @@ namespace WebApi
             });
 
             builder.Services.AddCors();
+            
             builder.Services.AddEndpointsApiExplorer();
 
             builder.Services.AddSwaggerGen(options => {
@@ -40,7 +42,7 @@ namespace WebApi
 
             builder.Services.AddAuthorization(options =>
             {
-                options.AddPolicy(BuildInPolicies.Identified, policy =>
+                options.AddPolicy(ApplicationPolicies.Identified, policy =>
                 {
                     policy.Requirements.Add(new IdentifiedRequirement());
                 });

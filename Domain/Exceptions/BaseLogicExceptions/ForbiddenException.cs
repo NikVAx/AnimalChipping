@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-    public class ForbiddenException :
-        Exception
+    public class ForbiddenException : Exception
     {
         public ForbiddenException() { }
 

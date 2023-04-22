@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
-
     public class AnimalLocationPointService :
         IAnimalLocationPointService
     {
@@ -48,13 +47,13 @@ namespace Application.Services
                 .FirstOrDefaultAsync(x => x.Id == pointId);
 
             if (animal == null)
-                throw new NotFoundException($"Animal with Id {animalId} is not found");
+                throw new NotFoundException(typeof(Animal), animalId);
             
             if (point == null)
-                throw new NotFoundException($"LocationPoint with Id {pointId} is not found");
+                throw new NotFoundException(typeof(LocationPoint), pointId);
             
             if (animal.LifeStatus == LifeStatus.DEAD)
-                throw new OperationException("The Animal is dead, moving is impossible");
+                throw new InvalidDomainOperationException("The Animal is dead, moving is impossible");
 
             if(animal.HasVisitedLocations())
             {
@@ -63,12 +62,12 @@ namespace Application.Services
                     .Last();
 
                 if(lastVisitedLocation.LocationPointId == pointId)
-                    throw new OperationException("The last VisitedLocatioPoint and new VisitedLocationPoint is equal");
+                    throw new InvalidDomainOperationException("The last VisitedLocationPoint and new VisitedLocationPoint is equal");
             }
             else
             {
                 if(pointId == animal.ChippingLocationId)
-                    throw new OperationException("ChippingLocationPoint and added LocationPoint is equal");
+                    throw new InvalidDomainOperationException("ChippingLocationPoint and added LocationPoint is equal");
             }
 
             var location = new AnimalVisitedLocation()
@@ -100,16 +99,17 @@ namespace Application.Services
                 .FirstOrDefaultAsync(x => x.Id == animalId);
 
             if(animal == null)
-                throw new NotFoundException($"Animal with Id {animalId} is not found");
+                throw new NotFoundException(typeof(Animal), animalId);
 
             var visitedLocationPoint = await _applicationDbContext.AnimalVisitedLocations
                 .FirstOrDefaultAsync(x => x.Id == visitedPointId);
 
             if(visitedLocationPoint == null)
-                throw new NotFoundException($"VisitedLocationPoint with Id {visitedPointId} is not found");
+                throw new NotFoundException(typeof(AnimalVisitedLocation), visitedPointId);
 
-            if(animal.VisitedLocations.Any(x => x.Id == visitedPointId) == false)
-                throw new NotFoundException($"Animal with Id {animalId} doesn't have VisitedLocationPoint with Id {visitedPointId}");
+            if (animal.VisitedLocations.Any(x => x.Id == visitedPointId) == false)
+                throw new NotFoundException(typeof(AnimalVisitedLocation), visitedPointId,
+                    typeof(Animal), animalId);
 
             var firstVisitedLocation = animal.VisitedLocations
                 .OrderBy(x => x.DateTimeOfVisitLocationPoint)
@@ -133,7 +133,6 @@ namespace Application.Services
             {
                 // TODO: Warning - it is possible that two consecutive points will be equal
                 // 1 [0] - 2 [1] - 3 [2] - 2 [3] => remove 3 [2] =>  1 [0] - 2 [1] - 2 [2]
-
                 var location = animal.VisitedLocations
                     .First(x => x.Id == visitedPointId);
 
@@ -153,26 +152,27 @@ namespace Application.Services
                 .FirstOrDefaultAsync(x => x.Id == visitedLocationPointId);
 
             if(visitedLocation == null)
-                throw new NotFoundException("VisitedLocationPoint not found");
+                throw new NotFoundException(typeof(AnimalVisitedLocation), visitedLocationPointId);
 
             var locationPoint = await _applicationDbContext.LocationPoints
                 .FirstOrDefaultAsync(x => x.Id == locationPointId);
 
-            if(locationPoint == null)
-                throw new NotFoundException("LocationPoint not found");
+            if (locationPoint == null)
+                throw new NotFoundException(typeof(LocationPoint), locationPointId);
 
             if(visitedLocation.LocationPointId == locationPoint.Id)
-                throw new OperationException("Changing the point to itself");
+                throw new InvalidDomainOperationException("Changing the point to itself");
 
             var animal = await _applicationDbContext.Animals
                 .Include(x=> x.VisitedLocations)
                 .FirstOrDefaultAsync(x => x.Id == animalId);
 
             if(animal == null)
-                throw new NotFoundException("Animal not found");
+                throw new NotFoundException(typeof(Animal), animalId);
 
-            if(animal.HasVisitedLocations() == false || animal.VisitedLocations.Contains(visitedLocation) == false)
-                throw new NotFoundException("Animal doesn't have required VisitedLocationPoint");
+            if (!(animal.HasVisitedLocations() && animal.VisitedLocations.Contains(visitedLocation)))
+                throw new NotFoundException(typeof(AnimalVisitedLocation), visitedLocation.Id,
+                    typeof(Animal), animal.Id);
 
             var listOfVisited = animal.VisitedLocations
                 .OrderBy(x => x.DateTimeOfVisitLocationPoint)
@@ -186,15 +186,15 @@ namespace Application.Services
                 if(locationPoint.Id == animal.ChippingLocationId ||
                    locationPoint.Id == visitedLocation.LocationPointId)
                 {
-                    throw new OperationException("Invalid location points order");
+                    throw new InvalidDomainOperationException("Invalid location points order");
                 }
             }
             else
             {
                 if(listOfVisited.ElementAt(index - 1).LocationPointId == locationPointId)
-                    throw new OperationException("Invalid location points order");
+                    throw new InvalidDomainOperationException("Invalid location points order");
                 if(listOfVisited.ElementAt(index + 1).LocationPointId == locationPointId)
-                    throw new OperationException("Invalid location points order");       
+                    throw new InvalidDomainOperationException("Invalid location points order");       
             }
 
             visitedLocation.LocationPointId = locationPoint.Id;

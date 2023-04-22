@@ -6,7 +6,7 @@
         public const string Anonymous = "Anonymous";
     }
 
-    public class BuildInPolicies
+    public class ApplicationPolicies
     {
         public const string Identified = "Identified";
     }

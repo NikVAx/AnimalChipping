@@ -8,7 +8,7 @@ using WebApi.DTOs.VisitedLocationPoint;
 
 namespace WebApi.Controllers
 {
-    [Route("animals/{animalId:long}")]
+    [Route("animals/{animalId:long}/locations")]
     [ApiController]
     [Authorize]
     public class AnimalVisitedLocationsController :
@@ -29,7 +29,7 @@ namespace WebApi.Controllers
         }
 
 
-        [HttpGet("locations")]
+        [HttpGet("")]
         public async Task<ActionResult<IEnumerable<GetVisitedLocationPointDto>>> GetLocations(
             [MinInt64(1)] long animalId,
             [FromQuery] LocationFilterDto filterDto,
@@ -48,8 +48,8 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost("locations/{pointId:long}")]
-        [Authorize(policy: BuildInPolicies.Identified)]
+        [HttpPost("{pointId:long}")]
+        [Authorize(policy: ApplicationPolicies.Identified)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -66,8 +66,8 @@ namespace WebApi.Controllers
             return Created("animals/{animalId}/locations", result);
         }
 
-        [Authorize(policy: BuildInPolicies.Identified)]
-        [HttpPut("locations")]
+        [Authorize(policy: ApplicationPolicies.Identified)]
+        [HttpPut("")]
         public async Task<ActionResult<GetVisitedLocationPointDto>> UpdateLocations(
             [MinInt64(1)] long animalId,
             UpdateVisitedLocationPointDto updateDto)
@@ -81,8 +81,8 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        //[Authorize(policy: BuildInPolicies.Identified)]
-        [HttpDelete("locations/{visitedPointId:long}")]
+        [Authorize(policy: ApplicationPolicies.Identified)]
+        [HttpDelete("{visitedPointId:long}")]
         public async Task<ActionResult> DeleteLocation(
             [MinInt64(1)] long animalId,
             [MinInt64(1)] long visitedPointId)

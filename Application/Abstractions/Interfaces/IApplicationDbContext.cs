@@ -9,7 +9,7 @@ namespace Application.Abstractions.Interfaces
         public DbSet<AnimalType> AnimalTypes { get; set; }
         public DbSet<Animal> Animals { get; set; }
         public DbSet<LocationPoint> LocationPoints { get; set; }
-        public DbSet<Account> Account { get; set; }
+        public DbSet<Account> Accounts { get; set; }
         public DbSet<AnimalVisitedLocation> AnimalVisitedLocations { get; set; }
 
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

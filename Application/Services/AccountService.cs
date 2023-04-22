@@ -7,15 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
-    public class AccountService :
-        IAccountService
+    public class AccountService : IAccountService
     {
-
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IPasswordHasher<Account> _passwordHasher;
 
         public AccountService(
-            IApplicationDbContext applicationDbContext,
+            IApplicationDbContext applicationDbContext, 
             IPasswordHasher<Account> passwordHasher)
         {
             _applicationDbContext = applicationDbContext;
@@ -24,18 +22,25 @@ namespace Application.Services
 
         public async Task<Account?> GetByEmailAsync(string email)
         {
-            var account = await _applicationDbContext.Account
+            var account = await _applicationDbContext.Accounts
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Email == email);
-            
             return account;
         }
 
         public async Task<Account?> GetByIdAsync(int id)
         {
-            var account = await _applicationDbContext.Account
-                .AsNoTracking()
-                .FirstAsync(id);
+            Account? account;
+            try
+            {
+                account = await _applicationDbContext.Accounts
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Id == id);
+            }
+            catch (Exception e)
+            {
+                account = null;
+            }
             
             return account;
         }
@@ -49,13 +54,11 @@ namespace Application.Services
 
                 if(haveRelationsWithAnimals)
                 {
-                    throw new OperationException("Account is related with Animal");
+                    throw new InvalidDomainOperationException("Account is related with Animal");
                 }
-
-                var entity = new Account() { Id = id };
-
-                _applicationDbContext.Account
-                    .Remove(entity);
+                
+                _applicationDbContext.Accounts
+                    .Remove(new Account() { Id = id });
 
                 await _applicationDbContext
                     .SaveChangesAsync();
@@ -65,10 +68,10 @@ namespace Application.Services
                 throw new ForbiddenException("Forbidden", ex);
             }
         }
-
+        
         public async Task<IEnumerable<Account>> SearchAsync(AccountFilter filter, int from = 0, int size = 10)
         {
-            var query = _applicationDbContext.Account.AsQueryable();
+            var query = _applicationDbContext.Accounts.AsQueryable();
             
             if(filter.FirstName != null)
                 query = query.Where(x => x.FirstName.ToLower()
@@ -96,7 +99,7 @@ namespace Application.Services
                 account.Password = _passwordHasher
                     .HashPassword(account, account.Password);
                 
-                _applicationDbContext.Account
+                _applicationDbContext.Accounts
                     .Update(account);
                 
                 await _applicationDbContext
@@ -115,7 +118,7 @@ namespace Application.Services
                 account.Password = _passwordHasher
                     .HashPassword(account, account.Password);
                
-                _applicationDbContext.Account
+                _applicationDbContext.Accounts
                     .Add(account);
                 
                 await _applicationDbContext
@@ -129,7 +132,8 @@ namespace Application.Services
 
         public PasswordVerificationResult VerifyPassword(Account account, string password)
         {
-            return _passwordHasher.VerifyHashedPassword(account, account.Password, password);
+            return _passwordHasher
+                .VerifyHashedPassword(account, account.Password, password);
         }
     }
 }

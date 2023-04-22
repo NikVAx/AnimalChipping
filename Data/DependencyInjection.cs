@@ -11,8 +11,7 @@ namespace Data
         public static IServiceCollection AddDataLayer(
             this IServiceCollection services, IConfiguration configuration)
         {
-            var connectionString = configuration
-                .GetConnectionString("DefaultConnection");
+            const string connectionString = @"Host=host.docker.internal;Port=5432;Database=chippingapplicationdb;Username=admin;Password=admin";
 
             services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
             {

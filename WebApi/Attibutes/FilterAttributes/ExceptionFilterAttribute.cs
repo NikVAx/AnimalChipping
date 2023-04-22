@@ -25,7 +25,7 @@ namespace WebApi.Filters
                     context.Result = new ForbidResult("BasicAuthentication");
                     break;
 
-                case OperationException:
+                case InvalidDomainOperationException:
                     context.Result = new BadRequestObjectResult(context.Exception.Message);
                     break;
 

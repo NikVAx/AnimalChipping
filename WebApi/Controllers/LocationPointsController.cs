@@ -48,7 +48,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(policy: BuildInPolicies.Identified)]
+        [Authorize(policy: ApplicationPolicies.Identified)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -68,7 +68,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut("{pointId:long}")]
-        [Authorize(policy: BuildInPolicies.Identified)]
+        [Authorize(policy: ApplicationPolicies.Identified)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -91,7 +91,7 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete("{pointId:long}")]
-        [Authorize(policy: BuildInPolicies.Identified)]
+        [Authorize(policy: ApplicationPolicies.Identified)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> Delete(

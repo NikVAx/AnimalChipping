@@ -50,7 +50,7 @@ namespace Application.Services
             }
             catch(DbUpdateConcurrencyException ex)
             {
-                throw new NotFoundException($"AnimalType with Id {entity.Id} not found", ex);
+                throw new NotFoundException(typeof(AnimalType), entity.Id, ex);
             }
             catch(DbUpdateException ex)
             {
@@ -65,10 +65,10 @@ namespace Application.Services
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if(type == null)
-                throw new NotFoundException($"AnimalType with Id {id} not found");
+                throw new NotFoundException(typeof(AnimalType), id);
 
             if(type.Animals.Count > 0)
-                throw new OperationException($"AnimalType with Id {id} have related Animals");
+                throw new InvalidDomainOperationException($"AnimalType with Id {id} have related Animals");
 
             _applicationDbContext.AnimalTypes
                 .Remove(type);

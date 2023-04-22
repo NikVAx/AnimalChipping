@@ -25,7 +25,5 @@ namespace WebApi.Middleware
 
             await defatultHandler.HandleAsync(next, context, policy, authorizeResult);
         }
-
-
     }
 }
